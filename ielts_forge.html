@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>IELTS Forge</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--red:#e30613;--dark:#1a1a1a;--grey:#4a4a4a;--light:#f5f5f5;--border:#d4d4d4;--blue:#0066cc;--green:#00a651;--orange:#f39c12;--forge:#e84010;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans Pro',Arial,sans-serif;background:#fff;color:var(--dark);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:14px;}
+
+/* AUTH */
+#authOverlay{position:fixed;inset:0;background:linear-gradient(135deg,#0d1b2a,#1a3a52);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.auth-card{background:#fff;border-radius:14px;padding:28px 26px;width:400px;box-shadow:0 25px 70px rgba(0,0,0,.45);max-height:92vh;overflow-y:auto;}
+.auth-logo{text-align:center;margin-bottom:14px;}
+.auth-logo .icon{font-size:2rem;display:block;}
+.auth-logo .name{font-size:20px;font-weight:700;}.auth-logo .name span{color:var(--forge);}
+.auth-tabs{display:flex;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;margin-bottom:18px;}
+.atab{flex:1;padding:8px;font-size:13px;font-weight:600;cursor:pointer;background:#f5f5f5;border:none;font-family:inherit;color:var(--grey);}
+.atab.active{background:var(--dark);color:#fff;}
+.alabel{font-size:12px;font-weight:600;color:var(--dark);margin-bottom:4px;display:block;}
+.ainput{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:9px 11px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;transition:border .15s;}
+.ainput:focus{border-color:var(--blue);}
+.cap-wrap{background:#f5f5f5;border:1.5px solid var(--border);border-radius:6px;padding:8px 11px;margin-bottom:10px;display:flex;align-items:center;gap:9px;}
+.cap-refresh{background:none;border:1px solid var(--border);border-radius:4px;width:28px;height:28px;cursor:pointer;}
+.aerr{color:var(--red);font-size:12px;margin-bottom:8px;font-weight:600;display:none;}
+.aok{color:var(--green);font-size:12px;margin-bottom:8px;font-weight:600;display:none;}
+.abtn{width:100%;background:var(--dark);color:#fff;border:none;border-radius:7px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;}
+.abtn:hover{background:#000;}
+.abtn.secondary{background:#fff;color:var(--dark);border:1.5px solid var(--border);}
+.abtn.secondary:hover{background:#f5f5f5;}
+.adivider{text-align:center;font-size:12px;color:var(--grey);margin:8px 0;position:relative;}
+.adivider::before,.adivider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);}
+.adivider::before{left:0;}.adivider::after{right:0;}
+
+/* VERIFY CODE MODAL */
+#verifyModal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10000;display:none;align-items:center;justify-content:center;}
+#verifyModal.on{display:flex;}
+.verify-box{background:#fff;border-radius:12px;padding:28px 26px;width:360px;text-align:center;}
+.verify-box h3{font-size:18px;font-weight:700;margin-bottom:6px;}
+.verify-box p{font-size:13px;color:var(--grey);margin-bottom:16px;line-height:1.6;}
+.code-display{background:#f0f7ff;border:2px dashed var(--blue);border-radius:8px;padding:14px;font-size:28px;font-weight:700;letter-spacing:6px;color:var(--dark);margin-bottom:14px;font-family:monospace;}
+
+/* PROFILE MODAL */
+#profileModal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:5000;display:none;align-items:center;justify-content:center;}
+#profileModal.on{display:flex;}
+.profile-box{background:#fff;border-radius:12px;width:420px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+.profile-head{background:var(--dark);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.profile-body{padding:20px;overflow-y:auto;flex:1;}
+.profile-avatar-section{text-align:center;margin-bottom:18px;}
+.profile-pic{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:8px;border:3px solid var(--border);}
+.profile-avatar-letter{width:80px;height:80px;border-radius:50%;background:var(--forge);color:#fff;font-size:28px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-bottom:8px;}
+.avatar-upload-btn{font-size:12px;color:var(--blue);cursor:pointer;text-decoration:underline;}
+
+/* ADMIN PANEL */
+#adminModal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;}
+#adminModal.on{display:flex;}
+.admin-box{background:#fff;border-radius:12px;width:95%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+.admin-head{background:var(--dark);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;}
+.admin-tabs{display:flex;gap:0;background:#f5f5f5;border-bottom:1px solid var(--border);}
+.admin-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;color:var(--grey);border:none;background:none;font-family:inherit;border-bottom:2px solid transparent;}
+.admin-tab.active{color:var(--dark);border-bottom-color:var(--dark);}
+.admin-body{padding:16px 20px;overflow-y:auto;flex:1;}
+.admin-user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.admin-del-btn{margin-left:auto;padding:4px 10px;background:#fee2e2;color:var(--red);border:1px solid #fca5a5;border-radius:5px;cursor:pointer;font-size:12px;font-family:inherit;}
+
+/* NAV */
+nav{background:var(--dark);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 1.1rem;flex-shrink:0;z-index:200;}
+.nav-logo{display:flex;align-items:center;gap:7px;cursor:pointer;}
+.nav-logo span{font-size:13px;font-weight:700;color:#fff;}.nav-logo span em{color:var(--forge);font-style:normal;}
+.nav-tabs{display:flex;gap:2px;}
+.ntab{background:none;border:none;color:#9ca3af;font-family:inherit;font-size:12px;font-weight:500;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.ntab:hover,.ntab.active{background:rgba(232,64,16,.2);color:#f87171;}
+.ntab.vocab-tab{color:#fcd34d!important;}
+.ntab.vocab-tab:hover,.ntab.vocab-tab.active{background:rgba(252,211,77,.15)!important;}
+.ntab.comm-tab{color:#6ee7b7!important;}
+.ntab.comm-tab:hover,.ntab.comm-tab.active{background:rgba(110,231,183,.12)!important;}
+.nav-right{display:flex;align-items:center;gap:7px;}
+.user-pill{cursor:pointer;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:3px 11px;}
+.user-pill:hover{background:rgba(255,255,255,.18);}
+.uav{width:24px;height:24px;border-radius:50%;background:var(--forge);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.uav img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.unm{font-size:12px;color:#fff;}
+.logout-btn{background:none;border:1px solid rgba(255,255,255,.15);color:#9ca3af;border-radius:5px;padding:3px 9px;font-size:11.5px;cursor:pointer;font-family:inherit;}
+
+/* TOPBAR */
+.topbar{background:#fff;border-bottom:1.5px solid var(--border);height:44px;display:flex;align-items:center;padding:0 1rem;gap:7px;flex-shrink:0;z-index:100;overflow-x:auto;}
+.chip{padding:3px 12px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:11.5px;font-weight:600;cursor:pointer;color:var(--grey);transition:all .18s;font-family:inherit;white-space:nowrap;}
+.chip:hover{border-color:var(--forge);color:var(--forge);}
+.chip.active{background:var(--dark);color:#f87171;border-color:var(--dark);}
+.tb-right{margin-left:auto;font-size:11px;color:var(--grey);white-space:nowrap;padding-left:6px;}
+
+/* PANELS */
+.panel{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.panel.active{display:flex;}
+#panel-home{overflow-y:auto;flex-direction:column;}
+
+/* HOME */
+.home-hero{background:linear-gradient(135deg,#0d1b2a,#1a2e3d);color:#fff;padding:22px 34px;flex-shrink:0;}
+.home-hero h1{font-size:24px;font-weight:700;margin-bottom:3px;}
+.home-hero h1 span{color:var(--forge);}
+.home-body{padding:22px 34px 30px;overflow-y:auto;}
+.mods-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px;margin-top:12px;}
+.mcard{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:18px;cursor:pointer;transition:all .2s;position:relative;}
+.mcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.1);border-color:var(--blue);}
+.mcard-num{position:absolute;top:12px;right:13px;background:var(--dark);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.mcard-icon{font-size:30px;margin-bottom:7px;}
+.mcard-name{font-size:15px;font-weight:700;margin-bottom:2px;}
+.mcard-info{font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:8px;}
+.mcard-meta{font-size:10.5px;color:var(--blue);font-weight:600;text-transform:uppercase;}
+
+/* SPLIT */
+.split{display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden;}
+.s-left{overflow-y:auto;padding:16px 20px;border-right:2px solid var(--border);background:#fff;}
+.s-right{overflow-y:auto;padding:14px 16px;background:#fafafa;}
+
+/* EXAM HEADER */
+.exam-header{background:#fff;border-bottom:2px solid var(--dark);padding:7px 13px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.eh-logo{font-weight:700;font-size:14px;cursor:pointer;}.eh-logo span{color:var(--forge);}
+.eh-timer{background:var(--dark);color:#fff;padding:4px 12px;border-radius:4px;font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;}
+.eh-timer.warn{background:var(--red);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.75;}}
+.eh-btn{padding:4px 11px;background:#fff;border:1.5px solid var(--border);border-radius:4px;font-size:11.5px;cursor:pointer;font-family:inherit;font-weight:600;}
+.eh-btn.danger{background:var(--red);color:#fff;border-color:var(--red);}
+
+/* HIGHLIGHT TOOLBAR */
+.hl-toolbar{background:#fffbeb;border-bottom:1px solid #fde68a;padding:5px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.hl-toggle{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border:1.5px solid var(--border);border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;background:#fff;color:var(--grey);font-family:inherit;}
+.hl-toggle.on{background:#fef08a;border-color:#f59e0b;color:#713f12;}
+.hl-clear-btn{font-size:11.5px;color:var(--red);cursor:pointer;font-weight:600;background:none;border:none;font-family:inherit;}
+.hl-hint{font-size:11px;color:var(--grey);font-style:italic;}
+span.hl{background:#fef08a;border-radius:2px;cursor:pointer;}
+span.hl:hover{background:#fde047;}
+
+/* AUDIO BAR */
+.audio-bar{background:#1e3a4f;color:#fff;padding:8px 13px;display:flex;align-items:center;gap:11px;flex-shrink:0;}
+.aplay-btn{width:30px;height:30px;border-radius:50%;background:var(--red);border:none;color:#fff;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.aplay-btn:hover{background:#b80510;}
+.audio-pw{flex:1;display:flex;align-items:center;gap:8px;}
+.audio-time{font-size:11px;color:#94a3b8;font-variant-numeric:tabular-nums;min-width:36px;}
+.audio-prog{flex:1;height:5px;background:#334155;border-radius:3px;overflow:hidden;cursor:pointer;}
+.audio-fill{height:100%;background:var(--red);width:0%;border-radius:3px;}
+.aspeed{font-size:10.5px;color:#fff;background:rgba(255,255,255,.12);padding:2px 7px;border-radius:4px;cursor:pointer;border:none;font-family:inherit;}
+.trans-toggle{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;padding:4px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-family:inherit;}
+.trans-toggle.on{background:rgba(248,180,0,.2);border-color:#f5d87a;color:#f5d87a;}
+
+/* SECTION TABS */
+.section-tabs{background:#f5f5f5;border-bottom:1px solid var(--border);padding:0 13px;display:flex;gap:0;flex-shrink:0;}
+.stab{padding:7px 18px;background:#e8e8e8;border:1px solid var(--border);border-bottom:none;border-radius:4px 4px 0 0;font-size:12px;font-weight:600;cursor:pointer;color:var(--grey);margin-right:3px;margin-top:4px;font-family:inherit;}
+.stab.active{background:#fff;color:var(--dark);border-bottom:1px solid #fff;margin-bottom:-1px;position:relative;z-index:1;}
+.stab .ss{font-size:9.5px;color:var(--green);font-weight:700;margin-left:3px;}
+
+/* PASSAGE */
+.pass-label{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:2px;margin-bottom:3px;}
+.pass-title{font-size:18px;font-weight:700;color:var(--dark);line-height:1.3;margin-bottom:2px;}
+.pass-sub{font-size:12px;color:var(--grey);font-style:italic;margin-bottom:5px;}
+.pass-divider{height:2px;background:linear-gradient(90deg,var(--dark),transparent);border-radius:2px;margin-bottom:11px;}
+.pass-body p{font-size:14.5px;line-height:1.95;color:var(--dark);margin-bottom:9px;}
+.para-lbl{font-weight:700;font-size:11.5px;background:#e8e8e8;width:19px;height:19px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;margin-right:5px;vertical-align:middle;}
+.cword{cursor:pointer;border-bottom:1px dashed var(--orange);transition:background .12s;}
+.cword:hover{background:#fff3a8;}
+
+/* TRANSCRIPT */
+.trans-panel{background:#1e293b;color:#e2e8f0;padding:13px 16px;font-size:14px;line-height:2;border-radius:6px;margin-top:8px;}
+.trans-panel.hidden{display:none;}
+.spkr{font-weight:700;color:#60a5fa;}
+.ans-mark .ans-txt{border-radius:3px;padding:0;transition:all .2s;}
+.show-ans .ans-mark .ans-txt{background:#fef08a;color:#713f12;font-weight:700;padding:1px 5px;border:1px solid #f59e0b;}
+.qmk{display:none;align-items:center;justify-content:center;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;margin:0 2px;cursor:pointer;vertical-align:middle;}
+.show-ans .qmk{display:inline-flex;}
+.ans-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--grey);font-family:inherit;margin-bottom:9px;}
+.ans-btn.on{background:#fef9c3;border-color:#f59e0b;color:#713f12;}
+
+/* QUESTIONS */
+.instructions{background:#fffbdb;border:1px solid #f0d878;padding:8px 12px;border-radius:4px;margin-bottom:12px;font-size:12.5px;line-height:1.5;}
+.q-group{margin-bottom:18px;}
+.q-group-header{font-weight:700;font-size:13px;color:var(--dark);margin-bottom:3px;}
+.q-group-instr{font-size:12px;color:var(--grey);margin-bottom:10px;line-height:1.5;}
+.q-row{display:flex;gap:8px;margin-bottom:7px;align-items:flex-start;padding:3px 0;}
+.qnb{background:var(--dark);color:#fff;font-weight:700;font-size:11px;min-width:21px;height:21px;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.q-text{flex:1;font-size:13px;line-height:1.6;display:flex;align-items:flex-start;gap:4px;flex-wrap:wrap;}
+.q-text input{border:1px solid var(--border);background:#fff;font-size:13px;padding:3px 7px;border-radius:3px;font-family:inherit;width:140px;outline:none;}
+.q-text input:focus{border-color:var(--blue);}
+.q-text input.ok{border-color:var(--green);background:#e8f8ee;}
+.q-text input.wrong{border-color:var(--red);background:#ffe8e8;}
+.ei{background:var(--blue);color:#fff;font-size:10px;font-weight:700;width:17px;height:17px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:2px;}
+.ei:hover{background:#0052a3;}
+.opt-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;}
+.opt{padding:3px 10px;border-radius:6px;border:1.5px solid var(--border);background:#fff;font-size:11px;font-weight:600;cursor:pointer;color:var(--grey);font-family:inherit;}
+.opt:hover{border-color:var(--blue);color:var(--blue);}
+.opt.sel{background:var(--blue);color:#fff;border-color:var(--blue);}
+.opt.ok{background:#e8f8ee;color:#0a5a2c;border-color:var(--green);pointer-events:none;}
+.opt.wrong{background:#ffe8e8;color:#8b1010;border-color:var(--red);pointer-events:none;}
+.mcq-options{display:flex;flex-direction:column;gap:4px;margin-top:4px;width:100%;}
+.mcq-opt{display:flex;align-items:flex-start;gap:7px;padding:6px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:12.5px;background:#fff;}
+.mcq-opt:hover{background:var(--light);}
+.mcq-opt.sel{background:#e8f1fa;border-color:var(--blue);}
+.mcq-opt.ok{background:#e8f8ee;border-color:var(--green);font-weight:600;}
+.mcq-opt.wrong{background:#ffe8e8;border-color:var(--red);}
+.mcl{font-weight:700;color:var(--blue);min-width:15px;}
+.q-ar{margin:3px 0 3px 29px;padding:7px 11px;background:#f0faf3;border-left:3px solid var(--green);border-radius:0 5px 5px 0;font-size:12px;line-height:1.7;display:none;}
+.q-ar.show{display:block;}
+.q-ar.wrong{background:#fff5f5;border-left-color:var(--red);}
+.ar-ans{font-weight:700;color:#0a5a2c;font-size:12.5px;}
+.ar-ans.w{color:#8b1010;}
+.ar-why{color:var(--grey);margin-top:2px;font-size:11.5px;}
+.ar-quote{background:#fffbdb;border-left:2px solid var(--orange);padding:3px 8px;margin-top:3px;font-style:italic;font-size:11px;color:#5a3a00;}
+
+/* WORD POPUP */
+#wordPopup{position:fixed;background:var(--dark);color:#fff;padding:12px 14px;border-radius:10px;font-size:13px;max-width:310px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);display:none;line-height:1.6;}
+.wp-word{font-size:14px;font-weight:700;color:#f5d87a;margin-bottom:2px;}
+.wp-type{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:3px;}
+.wp-gram{font-size:11px;color:#bfdbfe;margin-top:7px;padding:5px 8px;background:rgba(96,165,250,.1);border-left:2px solid #60a5fa;border-radius:0 4px 4px 0;line-height:1.6;}
+.wp-close{float:right;cursor:pointer;color:#9ca3af;font-size:12px;margin-left:7px;}
+
+/* EXPLANATION MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:998;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.on{display:flex;}
+.modal-box{background:#fff;width:90%;max-width:540px;max-height:84vh;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;}
+.modal-head{padding:12px 18px;background:var(--dark);color:#fff;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;}
+.modal-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;}
+.modal-body{padding:16px 20px;overflow-y:auto;font-size:14px;line-height:1.75;}
+.expl-pill{background:var(--green);color:#fff;font-weight:700;padding:2px 10px;border-radius:12px;font-size:12px;display:inline-block;}
+.expl-lbl{font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin:10px 0 3px;}
+.expl-quote{background:#fffbdb;border-left:3px solid var(--orange);padding:6px 10px;border-radius:0 5px 5px 0;font-style:italic;color:#5a3a00;font-size:13px;margin-top:4px;}
+
+/* WRITING / SPEAKING */
+.write-prompt{background:#fffbdb;border-left:4px solid var(--orange);padding:11px 14px;border-radius:0 6px 6px 0;font-size:14px;line-height:1.7;margin-bottom:12px;}
+textarea{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:9px;font-family:inherit;font-size:14px;line-height:1.75;resize:vertical;outline:none;}
+textarea:focus{border-color:var(--blue);}
+.wc{font-size:11px;color:var(--grey);margin:4px 0 8px;}
+.fb-box{margin-top:12px;display:none;}
+.fb-box.on{display:block;}
+.band-pill{display:inline-block;padding:5px 16px;border-radius:20px;font-weight:700;font-size:14px;margin-bottom:8px;}
+.band-high{background:#dcfce7;color:#0a5a2c;}
+.band-mid{background:#fffbdb;color:#7a4500;}
+.band-low{background:#fee2e2;color:#8b1010;}
+.fb-crit{background:#f8fafc;border-left:3px solid var(--blue);padding:7px 11px;border-radius:0 5px 5px 0;margin-bottom:5px;}
+.fb-crit-lbl{font-size:10.5px;font-weight:700;color:var(--dark);margin-bottom:2px;}
+.fb-crit-lbl .btag{background:var(--dark);color:#fff;padding:1px 7px;border-radius:8px;font-size:10px;margin-left:4px;}
+.fb-crit-txt{font-size:12.5px;color:var(--dark);line-height:1.6;}
+.fb-mistakes{background:#fff5f5;border-left:3px solid var(--red);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:7px;}
+.fb-mist-t{font-size:11px;font-weight:700;color:#8b1010;margin-bottom:4px;}
+.fb-mi{font-size:12px;line-height:1.65;margin-bottom:3px;}
+.fb-mi .orig{color:#8b1010;font-weight:600;font-style:italic;}
+.fb-impr{background:#fffbdb;border-left:3px solid var(--orange);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:7px;}
+.fb-impr-t{font-size:11px;font-weight:700;color:#7a4500;margin-bottom:4px;}
+.fb-rwr{background:#dcfce7;border-left:3px solid var(--green);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:7px;}
+.fb-rwr-t{font-size:11px;font-weight:700;color:#0a5a2c;margin-bottom:3px;}
+.fb-rwr-txt{font-size:12.5px;font-style:italic;color:#0a5a2c;}
+
+/* SPEAKING */
+.speak-box{background:linear-gradient(135deg,#0d1b2a,#1a2e3d);color:#fff;border-radius:8px;padding:13px 16px;margin-bottom:11px;}
+.sp-lbl{font-size:9.5px;color:#f5d87a;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px;}
+.sp-topic{font-size:14px;line-height:1.6;margin-bottom:4px;}
+.sp-bullets{margin-top:5px;padding:0;}
+.sp-bullets li{font-size:12px;color:#94a3b8;margin-bottom:2px;list-style:none;display:flex;gap:5px;}
+.sp-bullets li::before{content:'—';color:#f5d87a;}
+.timer-disp{font-size:40px;font-weight:700;color:var(--dark);text-align:center;margin:10px 0;font-variant-numeric:tabular-nums;}
+.timer-disp.run{color:var(--green);}
+.timer-disp.warn{color:var(--red);}
+
+/* RESULTS MODAL */
+#resultsModal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:997;display:none;align-items:center;justify-content:center;padding:20px;}
+#resultsModal.on{display:flex;}
+.results-box{background:#fff;width:90%;max-width:620px;max-height:86vh;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;}
+.rb-head{background:var(--dark);color:#fff;padding:16px 20px;}
+.rb-score{font-size:38px;font-weight:700;margin-top:7px;line-height:1;}
+.rb-band{background:#fff;color:var(--dark);padding:6px 14px;border-radius:26px;font-weight:700;font-size:15px;display:inline-block;margin-top:6px;}
+.rb-body{padding:14px 18px;overflow-y:auto;flex:1;}
+.rb-row{padding:6px 9px;border-bottom:1px solid #eee;font-size:12.5px;display:flex;gap:8px;align-items:center;}
+.rb-row.correct{background:#f0faf3;}.rb-row.wrong{background:#fff5f5;}
+.rb-foot{padding:11px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:#fafafa;}
+
+/* BOTTOM NAV BAR */
+.nav-bar{background:#fafafa;border-top:1px solid var(--border);padding:7px 13px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.mod-icons{display:flex;gap:5px;align-items:center;}
+.mi{width:32px;height:32px;border-radius:7px;background:#fff;border:1.5px solid var(--border);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;position:relative;}
+.mi:hover{border-color:var(--dark);}
+.mi.current{background:var(--dark);border-color:var(--dark);}
+.mi.done{background:var(--green);border-color:var(--green);}
+.mi .ml{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:8.5px;color:var(--grey);white-space:nowrap;font-weight:600;text-transform:uppercase;}
+.qnums{display:flex;gap:3px;flex-wrap:wrap;flex:1;justify-content:center;}
+.qnum{width:21px;height:21px;border:1px solid var(--border);background:#fff;font-size:10px;font-weight:600;cursor:pointer;border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--grey);font-family:inherit;}
+.qnum.answered{background:#e8f1fa;border-color:var(--blue);color:var(--blue);}
+.nav-btn{padding:5px 14px;background:var(--dark);color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;font-weight:600;font-family:inherit;}
+
+/* VOCABULARY */
+#panel-vocab{overflow:hidden;flex-direction:column;}
+.vocab-header{background:linear-gradient(135deg,#0d1b2a,#1a2e3d);color:#fff;padding:16px 26px;flex-shrink:0;}
+.vocab-header h2{font-size:18px;font-weight:700;margin-bottom:2px;}
+.vocab-main{flex:1;overflow:hidden;display:grid;grid-template-columns:240px 1fr;overflow:hidden;}
+.vocab-sidebar{background:#f9f9f9;border-right:1.5px solid var(--border);padding:14px;overflow-y:auto;}
+.vcat-btn{width:100%;text-align:left;padding:8px 11px;border-radius:7px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;color:var(--grey);transition:all .15s;margin-bottom:3px;display:flex;align-items:center;gap:7px;}
+.vcat-btn:hover{background:#e8e8e8;color:var(--dark);}
+.vcat-btn.active{background:var(--dark);color:#f87171;}
+.vsearch{width:100%;border:1.5px solid var(--border);border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none;margin-bottom:12px;}
+.vsearch:focus{border-color:var(--blue);}
+.vocab-content{overflow:hidden;display:flex;flex-direction:column;}
+.vocab-toolbar{background:#fff;border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.vocab-mode-btn{padding:5px 13px;border-radius:6px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:var(--grey);font-family:inherit;}
+.vocab-mode-btn.active{background:var(--dark);color:#fff;border-color:var(--dark);}
+.vocab-area{flex:1;overflow-y:auto;padding:16px;}
+
+/* WORD CARDS (Browse mode) */
+.word-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:11px;}
+.wcard{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;position:relative;}
+.wcard:hover{border-color:var(--blue);transform:translateY(-2px);}
+.wcard.flipped{border-color:var(--dark);background:var(--dark);}
+.wcard-type{font-size:9.5px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.wcard.flipped .wcard-type{color:#f5d87a;}
+.wcard-word{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:3px;}
+.wcard.flipped .wcard-word{color:#f5d87a;}
+.wcard-bn{font-size:12px;color:#0a5a2c;font-weight:600;}
+.wcard.flipped .wcard-bn{color:#86efac;}
+.wcard-hidden{display:none;margin-top:8px;}
+.wcard.flipped .wcard-hidden{display:block;}
+.wcard-def{font-size:12.5px;color:#e2e8f0;line-height:1.55;}
+.wcard-gram{font-size:11px;color:#60a5fa;margin-top:5px;font-style:italic;}
+.wcard-ex{font-size:11.5px;color:#94a3b8;margin-top:4px;font-style:italic;}
+.wcard-hint{position:absolute;bottom:7px;right:9px;font-size:9.5px;color:var(--border);}
+.wcard.flipped .wcard-hint{color:#475569;}
+.ielts-badge{font-size:9px;background:#e8f1fa;color:var(--blue);padding:1px 6px;border-radius:8px;font-weight:700;margin-left:5px;}
+
+/* QUIZ (Vocab) */
+.quiz-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:20px;max-width:600px;margin:0 auto;}
+.quiz-q{font-size:15px;font-weight:600;color:var(--dark);margin-bottom:14px;line-height:1.6;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.quiz-opt{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;background:#fff;transition:all .15s;font-family:inherit;text-align:left;}
+.quiz-opt:hover{border-color:var(--blue);background:#f0f7ff;}
+.quiz-opt.correct{border-color:var(--green);background:#e8f8ee;color:#0a5a2c;font-weight:600;}
+.quiz-opt.incorrect{border-color:var(--red);background:#ffe8e8;color:#8b1010;}
+.quiz-inp{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;}
+.quiz-inp:focus{border-color:var(--blue);}
+.quiz-feedback{font-size:13px;padding:9px 12px;border-radius:7px;margin-bottom:10px;display:none;}
+.quiz-feedback.ok{background:#e8f8ee;color:#0a5a2c;display:block;}
+.quiz-feedback.no{background:#ffe8e8;color:#8b1010;display:block;}
+.quiz-prog{font-size:12px;color:var(--grey);margin-bottom:10px;}
+.quiz-prog-bar{height:5px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.quiz-prog-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--green));border-radius:10px;}
+/* AI Search */
+.ai-word-result{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:18px;max-width:600px;margin:0 auto;}
+.ai-result-word{font-size:22px;font-weight:700;color:var(--dark);margin-bottom:3px;}
+.ai-result-type{font-size:11px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.ai-result-section{margin-bottom:10px;padding:9px 13px;background:#f8fafc;border-radius:6px;border-left:3px solid var(--blue);}
+.ai-result-section-title{font-size:10.5px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.ai-result-section.grammar{border-left-color:var(--orange);}
+.ai-result-section.grammar .ai-result-section-title{color:var(--orange);}
+.ai-result-section.example{border-left-color:var(--green);}
+.ai-result-section.example .ai-result-section-title{color:var(--green);}
+
+/* COMMUNITY */
+#panel-community{overflow:hidden;flex-direction:column;}
+.comm-header{background:linear-gradient(135deg,#0d1b2a,#1a2e3d);color:#fff;padding:16px 26px;flex-shrink:0;}
+.comm-header h2{font-size:18px;font-weight:700;margin-bottom:2px;}
+.comm-body-wrap{flex:1;overflow-y:auto;}
+.comm-body{padding:18px 26px;max-width:720px;margin:0 auto;}
+.post-composer{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;}
+.pc-row{display:flex;gap:9px;align-items:flex-start;}
+.pc-textarea{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-family:inherit;font-size:14px;resize:none;outline:none;min-height:65px;}
+.pc-textarea:focus{border-color:var(--blue);}
+.pc-actions{display:flex;align-items:center;gap:7px;margin-top:8px;padding-left:40px;}
+.pc-btn{padding:4px 11px;border-radius:5px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--grey);}
+.pc-btn:hover{border-color:var(--dark);}
+.pc-btn.submit-post{background:var(--dark);color:#fff;border-color:var(--dark);}
+.post-feed{display:flex;flex-direction:column;gap:11px;}
+.post-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:14px;}
+.post-header{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.post-av{width:38px;height:38px;border-radius:50%;background:var(--forge);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.post-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.post-author{font-weight:600;font-size:13px;}
+.post-time{font-size:11px;color:var(--grey);}
+.post-text{font-size:14px;line-height:1.7;margin-bottom:9px;}
+.post-img{max-width:100%;border-radius:8px;max-height:280px;object-fit:cover;display:block;margin-bottom:9px;}
+.post-file-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--blue);margin-bottom:7px;}
+.post-actions{display:flex;gap:10px;padding-top:7px;border-top:1px solid var(--border);}
+.post-action{background:none;border:none;font-size:12px;color:var(--grey);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px;padding:3px 6px;border-radius:5px;}
+.post-action:hover{background:var(--light);color:var(--dark);}
+.post-action.liked{color:var(--red);}
+.replies{margin-top:9px;border-top:1px solid var(--border);padding-top:9px;display:none;}
+.replies.open{display:block;}
+.reply-row{display:flex;gap:7px;margin-bottom:7px;align-items:flex-start;}
+.reply-av{width:26px;height:26px;border-radius:50%;background:#64748b;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.reply-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.reply-bubble{background:#f5f5f5;border-radius:8px;padding:6px 9px;flex:1;font-size:13px;line-height:1.6;}
+.reply-author{font-weight:600;font-size:11px;margin-bottom:1px;}
+.ri-row{display:flex;gap:7px;align-items:center;margin-top:5px;}
+.ri{flex:1;border:1.5px solid var(--border);border-radius:6px;padding:5px 9px;font-family:inherit;font-size:12.5px;outline:none;}
+.ri:focus{border-color:var(--blue);}
+.ri-submit{padding:5px 11px;background:var(--dark);color:#fff;border:none;border-radius:5px;font-size:12px;cursor:pointer;font-family:inherit;}
+
+/* SPIN */
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(0,102,204,.25);border-top-color:var(--blue);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:3px;}
+@keyframes sp{to{transform:rotate(360deg);}}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:#f0f0f0;}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:5px;}
+::-webkit-scrollbar-thumb:hover{background:#aaa;}
+</style>
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div id="authOverlay">
+<div class="auth-card">
+  <div class="auth-logo"><span class="icon">🔥</span><div class="name">IELTS <span>Forge</span></div></div>
+  <div style="text-align:center;font-size:12px;color:var(--grey);margin-bottom:14px;">Your IELTS practice platform</div>
+  <div class="auth-tabs">
+    <button class="atab active" onclick="switchATab('login',this)">Sign In</button>
+    <button class="atab" onclick="switchATab('register',this)">Register</button>
+  </div>
+  <!-- LOGIN -->
+  <div id="loginForm">
+    <label class="alabel">Email</label>
+    <input class="ainput" id="loginEmail" type="email" placeholder="your@email.com"/>
+    <label class="alabel">Password</label>
+    <input class="ainput" id="loginPass" type="password" placeholder="••••••••"/>
+    <label class="alabel">Security Check</label>
+    <div class="cap-wrap"><canvas id="cap1" width="130" height="40"></canvas><button class="cap-refresh" onclick="drawCap(1)">🔄</button></div>
+    <input class="ainput" id="loginCap" placeholder="Type the code above" style="margin-bottom:9px;"/>
+    <div class="aerr" id="loginErr"></div>
+    <button class="abtn" onclick="doLogin()">Sign In →</button>
+  </div>
+  <!-- REGISTER -->
+  <div id="registerForm" style="display:none;">
+    <label class="alabel">Full Name</label>
+    <input class="ainput" id="regName" type="text" placeholder="Your full name"/>
+    <label class="alabel">Gmail Address</label>
+    <input class="ainput" id="regEmail" type="email" placeholder="yourname@gmail.com"/>
+    <label class="alabel">Password (min 6 chars)</label>
+    <input class="ainput" id="regPass" type="password" placeholder="Choose a password"/>
+    <label class="alabel">Confirm Password</label>
+    <input class="ainput" id="regPass2" type="password" placeholder="Repeat password"/>
+    <label class="alabel">Security Check</label>
+    <div class="cap-wrap"><canvas id="cap2" width="130" height="40"></canvas><button class="cap-refresh" onclick="drawCap(2)">🔄</button></div>
+    <input class="ainput" id="regCap" placeholder="Type the code above" style="margin-bottom:9px;"/>
+    <div class="aerr" id="regErr"></div>
+    <div class="aok" id="regOk"></div>
+    <button class="abtn" onclick="sendVerifyCode()">Send Verification Code →</button>
+  </div>
+</div>
+</div>
+
+<!-- VERIFY MODAL -->
+<div id="verifyModal">
+<div class="verify-box">
+  <h3>📧 Verify Your Email</h3>
+  <p>A verification code has been sent to<br><strong id="verifyEmailDisplay"></strong><br><br>
+  <em style="color:var(--orange);">Demo mode: your code is shown below</em></p>
+  <div class="code-display" id="verifyCodeDisplay"></div>
+  <label class="alabel" style="text-align:left;">Enter the 6-digit code:</label>
+  <input class="ainput" id="verifyInput" placeholder="Enter code..." maxlength="6" style="text-align:center;font-size:18px;letter-spacing:4px;font-weight:700;"/>
+  <div class="aerr" id="verifyErr"></div>
+  <button class="abtn" onclick="confirmVerify()">Confirm & Create Account →</button>
+  <button class="abtn secondary" style="margin-top:6px;" onclick="cancelVerify()">Cancel</button>
+</div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="modal-overlay">
+<div class="profile-box">
+  <div class="profile-head"><div style="font-weight:700;">👤 My Profile</div><button class="modal-close" onclick="closeProfile()">×</button></div>
+  <div class="profile-body">
+    <div class="profile-avatar-section">
+      <div id="profileAvDisplay"></div>
+      <div><label class="avatar-upload-btn" for="avatarUpload">📷 Change Profile Picture</label></div>
+      <input type="file" id="avatarUpload" accept="image/*" style="display:none;" onchange="uploadAvatar(this)"/>
+    </div>
+    <label class="alabel">Full Name</label>
+    <input class="ainput" id="profName" type="text"/>
+    <label class="alabel">Email (cannot be changed)</label>
+    <input class="ainput" id="profEmail" type="email" readonly style="background:#f5f5f5;color:var(--grey);"/>
+    <label class="alabel">New Password (leave blank to keep current)</label>
+    <input class="ainput" id="profNewPass" type="password" placeholder="New password..."/>
+    <label class="alabel">Confirm New Password</label>
+    <input class="ainput" id="profConfirmPass" type="password" placeholder="Confirm new password..."/>
+    <div class="aerr" id="profErr"></div>
+    <div class="aok" id="profOk"></div>
+    <button class="abtn" onclick="saveProfile()">Save Changes</button>
+  </div>
+</div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminModal" class="modal-overlay">
+<div class="admin-box">
+  <div class="admin-head"><div style="font-weight:700;">⚙️ IELTS Forge — Admin Panel</div><button class="modal-close" onclick="closeAdmin()">×</button></div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="switchAdminTab('users',this)">👥 Users</button>
+    <button class="admin-tab" onclick="switchAdminTab('posts',this)">💬 Posts</button>
+  </div>
+  <div class="admin-body" id="adminBody"></div>
+</div>
+</div>
+
+<!-- EXPLANATION MODAL -->
+<div class="modal-overlay" id="explModal">
+<div class="modal-box">
+  <div class="modal-head"><div id="explTitle">Explanation</div><button class="modal-close" onclick="document.getElementById('explModal').classList.remove('on')">×</button></div>
+  <div class="modal-body" id="explBody"></div>
+</div>
+</div>
+
+<!-- RESULTS MODAL -->
+<div id="resultsModal">
+<div class="results-box">
+  <div class="rb-head"><div style="font-size:16px;font-weight:700;" id="rbTitle">Results</div><div class="rb-score" id="rbScore">0/40</div><span class="rb-band" id="rbBand">Band —</span></div>
+  <div class="rb-body" id="rbBody"></div>
+  <div class="rb-foot">
+    <button class="eh-btn" onclick="closeResults()">Review</button>
+    <button class="eh-btn" onclick="goHome()">← Home</button>
+  </div>
+</div>
+</div>
+
+<!-- WORD POPUP -->
+<div id="wordPopup">
+  <span class="wp-close" onclick="closeWP()">✕</span>
+  <div class="wp-type" id="wpType"></div>
+  <div class="wp-word" id="wpWord"></div>
+  <div id="wpDef"></div>
+  <div id="wpBn" style="font-size:12px;color:#86efac;font-style:italic;"></div>
+  <div class="wp-gram" id="wpGram" style="display:none;"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="goHome()"><span>🔥</span><span>IELTS <em>Forge</em></span></div>
+  <div class="nav-tabs">
+    <button class="ntab active" onclick="goHome()">🏠</button>
+    <button class="ntab" onclick="startModule('listening')">🎧 Listening</button>
+    <button class="ntab" onclick="startModule('reading')">📖 Reading</button>
+    <button class="ntab" onclick="startModule('writing')">✍️ Writing</button>
+    <button class="ntab" onclick="startModule('speaking')">🎤 Speaking</button>
+    <button class="ntab vocab-tab" onclick="goPanel('vocab')">📚 Vocabulary</button>
+    <button class="ntab comm-tab" onclick="goPanel('community')">💬 Community</button>
+  </div>
+  <div class="nav-right">
+    <div class="user-pill" onclick="openProfile()" title="Edit Profile">
+      <div class="uav" id="navAv">G</div>
+      <span class="unm" id="navName">Guest</span>
+    </div>
+    <button id="adminBtn" class="eh-btn" style="display:none;background:#f59e0b;color:#fff;border-color:#f59e0b;" onclick="openAdmin()">⚙️ Admin</button>
+    <button class="logout-btn" onclick="doLogout()">Sign out</button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="panel-home" class="panel active">
+  <div class="home-hero">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-size:12.5px;color:#9ca3af;">Welcome, <strong style="color:#fff;" id="homeGreet">Student</strong></div>
+    </div>
+    <h1>IELTS <span>Forge</span></h1>
+    <p style="font-size:13px;color:#9ca3af;">Complete IELTS practice — Listening • Reading • Writing • Speaking • Vocabulary</p>
+  </div>
+  <div class="home-body">
+    <div style="font-size:16px;font-weight:700;margin-bottom:12px;">📚 Choose a Module</div>
+    <div class="mods-grid">
+      <div class="mcard" onclick="startModule('listening')"><div class="mcard-num">1</div><div class="mcard-icon">🎧</div><div class="mcard-name">Listening</div><div class="mcard-info">40 questions, 4 sections. Audio + transcript toggle.</div><div class="mcard-meta">⏱ 30 min</div></div>
+      <div class="mcard" onclick="startModule('reading')"><div class="mcard-num">2</div><div class="mcard-icon">📖</div><div class="mcard-name">Reading</div><div class="mcard-info">4 passages, 28 questions. Yellow highlight + AI words.</div><div class="mcard-meta">⏱ 60 min</div></div>
+      <div class="mcard" onclick="startModule('writing')"><div class="mcard-num">3</div><div class="mcard-icon">✍️</div><div class="mcard-name">Writing</div><div class="mcard-info">Task 1 + Task 2 with AI feedback and band scoring.</div><div class="mcard-meta">⏱ 60 min</div></div>
+      <div class="mcard" onclick="startModule('speaking')"><div class="mcard-num">4</div><div class="mcard-icon">🎤</div><div class="mcard-name">Speaking</div><div class="mcard-info">Part 1 (4–5 min) + Part 2 (3–4 min) + Part 3 (4–5 min).</div><div class="mcard-meta">⏱ 11–14 min</div></div>
+      <div class="mcard" onclick="goPanel('vocab')" style="border-color:#f59e0b;"><div class="mcard-icon">📚</div><div class="mcard-name">Vocabulary</div><div class="mcard-info">IELTS + general words. Browse, flashcards, quiz, AI search.</div><div class="mcard-meta">⭐ 6 categories</div></div>
+      <div class="mcard" onclick="goPanel('community')" style="border-color:#6ee7b7;"><div class="mcard-icon">💬</div><div class="mcard-name">Community</div><div class="mcard-info">Post tips, questions, files. Chat with other students.</div><div class="mcard-meta">🌟 Discussion Board</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM CONTAINER -->
+<div id="examContainer" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+  <div class="exam-header">
+    <div class="eh-logo" onclick="goHome()">🔥 IELTS <span>Forge</span> — <span id="moduleTitle" style="color:var(--dark);font-weight:400;">Exam</span></div>
+    <div style="display:flex;align-items:center;gap:11px;"><div style="font-size:12px;font-weight:600;" id="sectionInfo">Section 1</div><div class="eh-timer" id="examTimer">⏱ 30:00</div></div>
+    <div style="display:flex;gap:6px;"><button class="eh-btn" onclick="goHome()">← Home</button><button class="eh-btn danger" onclick="submitTest()">Submit</button></div>
+  </div>
+  <div class="hl-toolbar" id="hlToolbar" style="display:none;">
+    <button class="hl-toggle" id="hlToggle" onclick="toggleHL(this)">🖊 Highlight: OFF</button>
+    <button class="hl-clear-btn" onclick="clearHL()">Clear all</button>
+    <span class="hl-hint">Turn ON, then select text to highlight yellow. Click a highlight to remove.</span>
+  </div>
+  <div class="audio-bar" id="audioBar" style="display:none;">
+    <button class="aplay-btn" id="playBtn" onclick="togglePlay()">▶</button>
+    <div class="audio-pw">
+      <span class="audio-time" id="audioCurrent">0:00</span>
+      <div class="audio-prog" onclick="seekAudio(event)"><div class="audio-fill" id="audioFill"></div></div>
+      <span class="audio-time" id="audioDur">0:00</span>
+    </div>
+    <span style="font-size:11px;color:#94a3b8;" id="audioLbl">Section 1</span>
+    <button class="aspeed" onclick="cycleSpeed()" id="speedBtn">1×</button>
+    <span style="font-size:10px;color:#f59e0b;font-style:italic;">🚫 Once only</span>
+    <button class="trans-toggle" id="transTgl" onclick="toggleTranscript()">📜 Show Transcript</button>
+  </div>
+  <div class="section-tabs" id="sectionTabs" style="display:none;">
+    <button class="stab active" id="stab1" onclick="switchSec(1)">Section 1<span class="ss" id="ss1"></span></button>
+    <button class="stab" id="stab2" onclick="switchSec(2)">Section 2<span class="ss" id="ss2"></span></button>
+    <button class="stab" id="stab3" onclick="switchSec(3)">Section 3<span class="ss" id="ss3"></span></button>
+    <button class="stab" id="stab4" onclick="switchSec(4)">Section 4<span class="ss" id="ss4"></span></button>
+  </div>
+  <!-- Reading passage selector tabs -->
+  <div class="topbar" id="passageTabs" style="display:none;">
+    <span style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;">Passage:</span>
+    <button class="chip active" id="ptab0" onclick="switchPassage(0)">Passage 1</button>
+    <button class="chip" id="ptab1" onclick="switchPassage(1)">Passage 2</button>
+    <button class="chip" id="ptab2" onclick="switchPassage(2)">Passage 3</button>
+    <button class="chip" id="ptab3" onclick="switchPassage(3)">Passage 4</button>
+    <div class="tb-right">⏱ 60 min total</div>
+  </div>
+  <div class="split" id="mainSplit">
+    <div class="s-left" id="leftPanel"></div>
+    <div class="s-right" id="rightPanel"></div>
+  </div>
+  <div class="nav-bar">
+    <div class="mod-icons">
+      <div class="mi current" id="mi-listening" onclick="startModule('listening')" title="Listening">🎧<span class="ml">Listen</span></div>
+      <div class="mi" id="mi-reading" onclick="startModule('reading')" title="Reading">📖<span class="ml">Read</span></div>
+      <div class="mi" id="mi-writing" onclick="startModule('writing')" title="Writing">✍️<span class="ml">Write</span></div>
+      <div class="mi" id="mi-speaking" onclick="startModule('speaking')" title="Speaking">🎤<span class="ml">Speak</span></div>
+    </div>
+    <div class="qnums" id="qNumGrid"></div>
+    <button class="nav-btn" onclick="nextOrSubmit()">Next →</button>
+  </div>
+</div>
+
+<!-- VOCABULARY PANEL -->
+<div id="panel-vocab" class="panel">
+  <div class="vocab-header">
+    <h2>📚 Vocabulary Builder</h2>
+    <p style="font-size:12.5px;color:#94a3b8;">IELTS + everyday English words with grammar explanations and quiz</p>
+  </div>
+  <div class="vocab-main">
+    <div class="vocab-sidebar">
+      <input class="vsearch" id="vocabSearch" placeholder="🔍 Search any word..." oninput="handleVocabSearch(this.value)" onkeydown="if(event.key==='Enter')doAIWordSearch()"/>
+      <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">Categories</div>
+      <button class="vcat-btn active" id="vcat-ai" onclick="setVCat('ai',this)">🤖 AI Word Search</button>
+      <button class="vcat-btn" id="vcat-academic" onclick="setVCat('academic',this)">🎓 IELTS Academic</button>
+      <button class="vcat-btn" id="vcat-environment" onclick="setVCat('environment',this)">🌿 Environment</button>
+      <button class="vcat-btn" id="vcat-technology" onclick="setVCat('technology',this)">💻 Technology</button>
+      <button class="vcat-btn" id="vcat-society" onclick="setVCat('society',this)">🏙️ Society</button>
+      <button class="vcat-btn" id="vcat-health" onclick="setVCat('health',this)">❤️ Health</button>
+      <button class="vcat-btn" id="vcat-everyday" onclick="setVCat('everyday',this)">💬 Everyday English</button>
+    </div>
+    <div class="vocab-content">
+      <div class="vocab-toolbar">
+        <span style="font-size:13px;font-weight:700;color:var(--dark);" id="vcatTitle">AI Word Search</span>
+        <div style="margin-left:auto;display:flex;gap:6px;" id="vocabModeBar" style="display:none;">
+          <button class="vocab-mode-btn active" onclick="setVMode('browse',this)">📋 Browse</button>
+          <button class="vocab-mode-btn" onclick="setVMode('flashcard',this)">🃏 Flashcards</button>
+          <button class="vocab-mode-btn" onclick="setVMode('quiz',this)">🧠 Quiz</button>
+        </div>
+      </div>
+      <div class="vocab-area" id="vocabArea">
+        <div style="max-width:540px;margin:0 auto;">
+          <div style="text-align:center;padding:20px 0 14px;">
+            <div style="font-size:2.5rem;margin-bottom:8px;">🔍</div>
+            <div style="font-size:16px;font-weight:700;margin-bottom:5px;">Search any word</div>
+            <div style="font-size:13px;color:var(--grey);margin-bottom:18px;">Type any English word above and press Enter — AI will explain its meaning, grammar, and give examples.</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <input class="ainput" id="aiWordInput" placeholder="Type any word..." onkeydown="if(event.key==='Enter')doAIWordSearch()" style="margin-bottom:0;"/>
+            <button class="abtn" onclick="doAIWordSearch()" style="width:auto;padding:9px 18px;margin-bottom:0;">Search</button>
+          </div>
+          <div id="aiWordResult" style="margin-top:16px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMUNITY PANEL -->
+<div id="panel-community" class="panel">
+  <div class="comm-header">
+    <h2>💬 Community</h2>
+    <p style="font-size:12.5px;color:#94a3b8;">Share tips, questions, and files with other IELTS students</p>
+  </div>
+  <div class="comm-body-wrap">
+  <div class="comm-body">
+    <div class="post-composer">
+      <div class="pc-row">
+        <div class="post-av" id="composerAv">G</div>
+        <textarea class="pc-textarea" id="composerText" placeholder="Share a tip, question, or update..."></textarea>
+      </div>
+      <div class="pc-actions">
+        <label class="pc-btn" style="cursor:pointer;">📷 Photo<input type="file" id="postImg" accept="image/*" style="display:none;" onchange="previewImg(this)"/></label>
+        <label class="pc-btn" style="cursor:pointer;">📎 File<input type="file" id="postFile" style="display:none;" onchange="previewFile(this)"/></label>
+        <span id="attachInfo" style="font-size:11.5px;color:var(--grey);"></span>
+        <button class="pc-btn submit-post" style="margin-left:auto;" onclick="submitPost()">Post</button>
+      </div>
+    </div>
+    <div class="post-feed" id="postFeed"></div>
+  </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════
+// CAPTCHA
+// ══════════════════════════
+let cap={1:'',2:''};
+function drawCap(n){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code='';for(let i=0;i<6;i++)code+=chars[Math.floor(Math.random()*chars.length)];
+  cap[n]=code;
+  const c=document.getElementById('cap'+n);if(!c)return;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,130,40);ctx.fillStyle='#f5f5f5';ctx.fillRect(0,0,130,40);
+  for(let i=0;i<35;i++){ctx.beginPath();ctx.arc(Math.random()*130,Math.random()*40,1,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.12)';ctx.fill();}
+  ctx.font='bold 20px monospace';ctx.textBaseline='middle';
+  for(let i=0;i<code.length;i++){
+    ctx.save();ctx.translate(10+i*19,20);ctx.rotate((Math.random()-.5)*.4);
+    ctx.fillStyle=`hsl(${Math.random()*360},60%,30%)`;ctx.fillText(code[i],0,0);ctx.restore();
+  }
+  for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(Math.random()*130,Math.random()*40);ctx.lineTo(Math.random()*130,Math.random()*40);ctx.strokeStyle='rgba(0,0,0,.15)';ctx.stroke();}
+}
+
+// ══════════════════════════
+// AUTH
+// ══════════════════════════
+function getUsers(){return JSON.parse(localStorage.getItem('if_users')||'[]');}
+function saveUsers(u){localStorage.setItem('if_users',JSON.stringify(u));}
+function getSession(){return JSON.parse(localStorage.getItem('if_session')||'null');}
+function saveSession(s){localStorage.setItem('if_session',JSON.stringify(s));}
+function hashPw(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h=h&h;}return h.toString(36);}
+
+let pendingReg=null,verifyCode='';
+
+function switchATab(tab,el){
+  document.querySelectorAll('.atab').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+}
+
+function sendVerifyCode(){
+  const name=document.getElementById('regName').value.trim();
+  const email=document.getElementById('regEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('regPass').value;
+  const pass2=document.getElementById('regPass2').value;
+  const capInput=document.getElementById('regCap').value.trim().toUpperCase();
+  const err=document.getElementById('regErr');
+  err.style.display='none';
+  if(!name){err.textContent='Please enter your name.';err.style.display='block';return;}
+  if(!email||!email.includes('@')||!email.includes('.')){err.textContent='Please enter a valid email address.';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
+  if(pass!==pass2){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  if(capInput!==cap[2]){err.textContent='CAPTCHA incorrect.';err.style.display='block';drawCap(2);document.getElementById('regCap').value='';return;}
+  const users=getUsers();
+  if(users.find(u=>u.email===email)){err.textContent='This email is already registered. Please sign in.';err.style.display='block';return;}
+  // Generate verify code
+  verifyCode=Math.floor(100000+Math.random()*900000).toString();
+  pendingReg={name,email,passwordHash:hashPw(pass)};
+  document.getElementById('verifyEmailDisplay').textContent=email;
+  document.getElementById('verifyCodeDisplay').textContent=verifyCode;
+  document.getElementById('verifyInput').value='';
+  document.getElementById('verifyErr').style.display='none';
+  document.getElementById('verifyModal').classList.add('on');
+}
+
+function confirmVerify(){
+  const input=document.getElementById('verifyInput').value.trim();
+  const err=document.getElementById('verifyErr');
+  if(input!==verifyCode){err.textContent='Incorrect code. Please try again.';err.style.display='block';return;}
+  const users=getUsers();
+  users.push({...pendingReg,avatar:'',registeredAt:Date.now()});
+  saveUsers(users);
+  document.getElementById('verifyModal').classList.remove('on');
+  const ok=document.getElementById('regOk');ok.textContent='Account created! You can now sign in.';ok.style.display='block';
+  setTimeout(()=>{switchATab('login',document.querySelectorAll('.atab')[0]);document.getElementById('loginEmail').value=pendingReg.email;},1500);
+  pendingReg=null;verifyCode='';
+}
+function cancelVerify(){document.getElementById('verifyModal').classList.remove('on');}
+
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  const capInput=document.getElementById('loginCap').value.trim().toUpperCase();
+  const err=document.getElementById('loginErr');err.style.display='none';
+  if(!email||!email.includes('@')){err.textContent='Please enter a valid email.';err.style.display='block';return;}
+  if(!pass){err.textContent='Please enter your password.';err.style.display='block';return;}
+  if(capInput!==cap[1]){err.textContent='CAPTCHA incorrect.';err.style.display='block';drawCap(1);document.getElementById('loginCap').value='';return;}
+  // Admin check
+  if(email==='admin@ieltsforge.com'&&pass==='Admin@1234'){
+    const s={name:'Admin',email:'admin@ieltsforge.com',avatar:'',isAdmin:true};
+    saveSession(s);finishLogin(s);return;
+  }
+  const users=getUsers();const user=users.find(u=>u.email===email);
+  if(!user){err.textContent='Email not registered.';err.style.display='block';return;}
+  if(user.passwordHash!==hashPw(pass)){err.textContent='Incorrect password.';err.style.display='block';return;}
+  const s={name:user.name,email:user.email,avatar:user.avatar||'',isAdmin:false};
+  saveSession(s);finishLogin(s);
+}
+
+let currentUser=null;
+function finishLogin(s){
+  currentUser=s;
+  document.getElementById('authOverlay').style.display='none';
+  document.getElementById('navName').textContent=s.name.split(' ')[0];
+  document.getElementById('homeGreet').textContent=s.name;
+  setNavAvatar(s);
+  document.getElementById('composerAv').textContent=s.name.charAt(0).toUpperCase();
+  if(s.avatar){const img=document.createElement('img');img.src=s.avatar;document.getElementById('composerAv').innerHTML='';document.getElementById('composerAv').appendChild(img);}
+  document.getElementById('adminBtn').style.display=s.isAdmin?'':'none';
+  renderPosts();
+}
+function setNavAvatar(s){
+  const av=document.getElementById('navAv');
+  if(s.avatar){av.innerHTML=`<img src="${s.avatar}" alt="avatar"/>`;} 
+  else{av.textContent=s.name.charAt(0).toUpperCase();}
+}
+function doLogout(){if(!confirm('Sign out?'))return;localStorage.removeItem('if_session');location.reload();}
+
+// PROFILE
+function openProfile(){
+  if(!currentUser){alert('Please sign in first.');return;}
+  document.getElementById('profName').value=currentUser.name;
+  document.getElementById('profEmail').value=currentUser.email;
+  document.getElementById('profNewPass').value='';
+  document.getElementById('profConfirmPass').value='';
+  document.getElementById('profErr').style.display='none';
+  document.getElementById('profOk').style.display='none';
+  const d=document.getElementById('profileAvDisplay');
+  if(currentUser.avatar){d.innerHTML=`<img class="profile-pic" src="${currentUser.avatar}"/>`;}
+  else{d.innerHTML=`<div class="profile-avatar-letter">${currentUser.name.charAt(0).toUpperCase()}</div>`;}
+  document.getElementById('profileModal').classList.add('on');
+}
+function closeProfile(){document.getElementById('profileModal').classList.remove('on');}
+function uploadAvatar(input){
+  if(!input.files||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    currentUser.avatar=e.target.result;
+    const d=document.getElementById('profileAvDisplay');d.innerHTML=`<img class="profile-pic" src="${e.target.result}"/>`;
+    setNavAvatar(currentUser);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function saveProfile(){
+  const name=document.getElementById('profName').value.trim();
+  const newPass=document.getElementById('profNewPass').value;
+  const confPass=document.getElementById('profConfirmPass').value;
+  const err=document.getElementById('profErr');const ok=document.getElementById('profOk');
+  err.style.display='none';ok.style.display='none';
+  if(!name){err.textContent='Name cannot be empty.';err.style.display='block';return;}
+  if(newPass&&newPass.length<6){err.textContent='New password must be at least 6 characters.';err.style.display='block';return;}
+  if(newPass&&newPass!==confPass){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  // Update in localStorage
+  if(!currentUser.isAdmin){
+    const users=getUsers();const idx=users.findIndex(u=>u.email===currentUser.email);
+    if(idx>=0){
+      users[idx].name=name;users[idx].avatar=currentUser.avatar;
+      if(newPass)users[idx].passwordHash=hashPw(newPass);
+      saveUsers(users);
+    }
+  }
+  currentUser.name=name;
+  saveSession(currentUser);
+  document.getElementById('navName').textContent=name.split(' ')[0];
+  document.getElementById('homeGreet').textContent=name;
+  setNavAvatar(currentUser);
+  ok.textContent='Profile saved!';ok.style.display='block';
+}
+
+// ADMIN
+function openAdmin(){
+  switchAdminTab('users',document.querySelector('.admin-tab'));
+  document.getElementById('adminModal').classList.add('on');
+}
+function closeAdmin(){document.getElementById('adminModal').classList.remove('on');}
+function switchAdminTab(tab,el){
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  const body=document.getElementById('adminBody');
+  if(tab==='users'){
+    const users=getUsers();
+    body.innerHTML=`<div style="font-size:13px;font-weight:700;margin-bottom:10px;">Registered Users (${users.length})</div>`+
+      (users.length?users.map(u=>`<div class="admin-user-row">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--forge);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;">${u.avatar?`<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`:u.name.charAt(0).toUpperCase()}</div>
+        <div><div style="font-weight:600;">${u.name}</div><div style="font-size:11.5px;color:var(--grey);">${u.email}</div></div>
+        <div style="font-size:11px;color:var(--grey);margin-left:auto;margin-right:10px;">${new Date(u.registeredAt).toLocaleDateString()}</div>
+        <button class="admin-del-btn" onclick="adminDelUser('${u.email}')">Delete</button>
+      </div>`).join(''):'<div style="color:var(--grey);font-size:13px;">No registered users yet.</div>');
+  }else{
+    const posts=getPosts();
+    body.innerHTML=`<div style="font-size:13px;font-weight:700;margin-bottom:10px;">Community Posts (${posts.length})</div>`+
+      (posts.length?posts.map(p=>`<div class="admin-user-row">
+        <div><div style="font-weight:600;">${p.author}</div><div style="font-size:11.5px;color:var(--grey);">${p.text?p.text.slice(0,60)+'...':'[image/file]'}</div></div>
+        <button class="admin-del-btn" onclick="adminDelPost(${p.id})">Delete</button>
+      </div>`).join(''):'<div style="color:var(--grey);font-size:13px;">No posts yet.</div>');
+  }
+}
+function adminDelUser(email){
+  if(!confirm('Delete user '+email+'?'))return;
+  const users=getUsers().filter(u=>u.email!==email);
+  saveUsers(users);switchAdminTab('users',document.querySelector('.admin-tab.active'));
+}
+function adminDelPost(id){
+  if(!confirm('Delete this post?'))return;
+  const posts=getPosts().filter(p=>p.id!==id);savePosts(posts);switchAdminTab('posts',document.querySelector('.admin-tab.active'));
+}
+
+// ══════════════════════════
+// WORD POPUP — AI
+// ══════════════════════════
+const wpCache={};
+async function showAIWord(word,e){
+  e.stopPropagation();
+  const clean=word.replace(/[^a-zA-Z'\-]/g,'').toLowerCase();
+  if(!clean||clean.length<2)return;
+  const p=document.getElementById('wordPopup');
+  p.style.display='block';
+  p.style.left=Math.min(e.clientX,window.innerWidth-320)+'px';
+  p.style.top=Math.min(e.clientY+12,window.innerHeight-190)+'px';
+  document.getElementById('wpWord').textContent=word.charAt(0).toUpperCase()+word.slice(1);
+  document.getElementById('wpType').textContent='';document.getElementById('wpGram').style.display='none';
+  if(wpCache[clean]){renderWP(wpCache[clean]);return;}
+  document.getElementById('wpDef').innerHTML='<span class="spin"></span>Loading...';
+  document.getElementById('wpBn').textContent='';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:280,
+        messages:[{role:'user',content:`Explain "${clean}" for IELTS students. Reply ONLY:
+TYPE: [part of speech]
+DEF: [clear 1-sentence definition]
+BN: [Bengali meaning]
+GRAMMAR: [1-sentence usage/grammar note]
+EXAMPLE: [1 example sentence]`}]})});
+    const d=await r.json();
+    const res=parseWR(d.content[0].text);wpCache[clean]=res;renderWP(res);
+  }catch{document.getElementById('wpDef').textContent='Could not load. Check connection.';}
+}
+function parseWR(t){
+  const r={type:'',def:'',bn:'',grammar:'',example:''};
+  t.split('\n').forEach(l=>{const s=l.trim();
+    if(s.startsWith('TYPE:'))r.type=s.slice(5).trim();
+    else if(s.startsWith('DEF:'))r.def=s.slice(4).trim();
+    else if(s.startsWith('BN:'))r.bn=s.slice(3).trim();
+    else if(s.startsWith('GRAMMAR:'))r.grammar=s.slice(8).trim();
+    else if(s.startsWith('EXAMPLE:'))r.example=s.slice(8).trim();
+  });return r;
+}
+function renderWP(r){
+  document.getElementById('wpType').textContent=r.type||'word';
+  document.getElementById('wpDef').textContent=r.def||'—';
+  document.getElementById('wpBn').textContent=r.bn?'🇧🇩 '+r.bn:'';
+  const g=document.getElementById('wpGram');
+  if(r.grammar||r.example){g.style.display='block';g.innerHTML=(r.grammar?`<strong>📖</strong> ${r.grammar}`:'')+
+    (r.example?`<div style="margin-top:4px;"><strong>✦</strong> <em>${r.example}</em></div>`:'');}
+  else g.style.display='none';
+}
+function closeWP(){document.getElementById('wordPopup').style.display='none';}
+document.addEventListener('click',()=>closeWP());
+
+// Wrap words in element
+function wrapWords(el){
+  if(!el||el.dataset.wrapped)return;el.dataset.wrapped='1';
+  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{acceptNode:node=>{
+    let p=node.parentElement;
+    while(p&&p!==el){if(p.tagName==='BUTTON'||p.tagName==='INPUT'||p.tagName==='TEXTAREA'||p.classList?.contains('qmk'))return NodeFilter.FILTER_REJECT;p=p.parentElement;}
+    return node.textContent.trim()?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+  }});
+  const nodes=[];let n;while(n=walker.nextNode())nodes.push(n);
+  nodes.forEach(tn=>{
+    const parts=tn.textContent.split(/(\s+)/);if(parts.length<=1)return;
+    const frag=document.createDocumentFragment();
+    parts.forEach(p=>{
+      if(/^\s*$/.test(p)){frag.appendChild(document.createTextNode(p));return;}
+      const clean=p.replace(/[^a-zA-Z'\-]/g,'');
+      if(clean.length<2){frag.appendChild(document.createTextNode(p));return;}
+      const span=document.createElement('span');span.className='cword';span.textContent=p;
+      span.onclick=ev=>{ev.stopPropagation();showAIWord(clean,ev);};frag.appendChild(span);
+    });
+    tn.parentNode.replaceChild(frag,tn);
+  });
+}
+
+// ══════════════════════════
+// HIGHLIGHT (Reading)
+// ══════════════════════════
+let hlMode=false;
+function toggleHL(btn){
+  hlMode=!hlMode;btn.classList.toggle('on',hlMode);
+  btn.textContent=hlMode?'🖊 Highlight: ON':'🖊 Highlight: OFF';
+}
+function clearHL(){document.querySelectorAll('span.hl').forEach(el=>{const p=el.parentNode;while(el.firstChild)p.insertBefore(el.firstChild,el);p.removeChild(el);});}
+
+// Mouse-up event on passage body: applied via event delegation on document
+document.addEventListener('mouseup',function(e){
+  if(!hlMode)return;
+  // Only apply if the selection is within the left panel or pass-body
+  const left=document.getElementById('leftPanel');
+  if(!left)return;
+  const sel=window.getSelection();
+  if(!sel||sel.rangeCount===0||sel.toString().trim()==='')return;
+  // Check if selection is within passage
+  const range=sel.getRangeAt(0);
+  if(!left.contains(range.commonAncestorContainer))return;
+  const span=document.createElement('span');
+  span.className='hl';
+  span.onclick=ev=>{ev.stopPropagation();const p=span.parentNode;while(span.firstChild)p.insertBefore(span.firstChild,span);p.removeChild(span);};
+  try{range.surroundContents(span);}catch{}
+  sel.removeAllRanges();
+});
+
+// ══════════════════════════
+// NAV
+// ══════════════════════════
+function goPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id)?.classList.add('active');
+  document.getElementById('examContainer').style.display='none';
+  if(id==='community')renderPosts();
+  if(id==='vocab'){setVCat('ai',document.getElementById('vcat-ai'));}
+}
+function goHome(){
+  stopTimers();
+  document.getElementById('examContainer').style.display='none';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-home').classList.add('active');
+}
+
+// ══════════════════════════
+// STATE
+// ══════════════════════════
+let curMod='',curSec=1,curPassIdx=0,curWriteTask=0,curSpPart=0;
+let userAnswers={};
+let examInterval=null,examSecs=0;
+let audioPlaying=false,audioElapsed=0,audioInterval=null,playSpeed=1;
+let spInterval=null,spSecs=0,spRunning=false;
+let submittedMods={};
+let transcriptVisible=false;
+
+function stopTimers(){
+  clearInterval(examInterval);clearInterval(audioInterval);clearInterval(spInterval);
+  audioPlaying=false;spRunning=false;
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
+}
+function startModule(mod){
+  stopTimers();curMod=mod;userAnswers={};transcriptVisible=false;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('examContainer').style.display='flex';
+  ['listening','reading','writing','speaking'].forEach(m=>{
+    const el=document.getElementById('mi-'+m);if(el)el.classList.toggle('current',m===mod);
+  });
+  document.getElementById('moduleTitle').textContent=mod.charAt(0).toUpperCase()+mod.slice(1);
+  document.getElementById('audioBar').style.display=mod==='listening'?'flex':'none';
+  document.getElementById('sectionTabs').style.display=mod==='listening'?'flex':'none';
+  document.getElementById('hlToolbar').style.display=mod==='reading'?'flex':'none';
+  document.getElementById('passageTabs').style.display=mod==='reading'?'flex':'none';
+  document.getElementById('qNumGrid').style.display=(mod==='writing'||mod==='speaking')?'none':'flex';
+  hlMode=false;const ht=document.getElementById('hlToggle');if(ht){ht.classList.remove('on');ht.textContent='🖊 Highlight: OFF';}
+  const tt=document.getElementById('transTgl');if(tt){tt.textContent='📜 Show Transcript';tt.classList.remove('on');}
+  const times={listening:30*60,reading:60*60,writing:60*60,speaking:14*60};
+  examSecs=times[mod];startExamTimer();
+  if(mod==='listening'){curSec=1;renderListening(1);}
+  else if(mod==='reading'){curPassIdx=0;renderReading();}
+  else if(mod==='writing'){curWriteTask=0;renderWriting();}
+  else if(mod==='speaking'){curSpPart=0;renderSpeaking();}
+}
+function startExamTimer(){
+  updateTimerDisp();
+  examInterval=setInterval(()=>{examSecs--;if(examSecs<=0){clearInterval(examInterval);examSecs=0;updateTimerDisp();submitTest();return;}updateTimerDisp();},1000);
+}
+function updateTimerDisp(){
+  const m=Math.floor(examSecs/60),s=examSecs%60;
+  const el=document.getElementById('examTimer');
+  el.textContent=`⏱ ${m}:${s.toString().padStart(2,'0')}`;el.classList.toggle('warn',examSecs<=300);
+}
+
+// ══════════════════════════
+// LISTENING DATA
+// ══════════════════════════
+const LD={sections:[
+  {n:1,title:'Section 1',ctx:'A phone call about gym membership.',dur:240,
+   trans:`<span class="spkr">REC:</span> Greenfield Sports Centre.<br><span class="spkr">CALLER:</span> Swimming classes please. Name: Daniel <span class="ans-mark"><span class="ans-txt">Roberts</span><span class="qmk" onclick="showExpl(1,'L')">1</span></span>.<br>
+<span class="spkr">REC:</span> <span class="ans-mark"><span class="ans-txt">Swimming</span><span class="qmk" onclick="showExpl(2,'L')">2</span></span> classes — Tuesday and <span class="ans-mark"><span class="ans-txt">Thursday</span><span class="qmk" onclick="showExpl(3,'L')">3</span></span> at <span class="ans-mark"><span class="ans-txt">7:15</span><span class="qmk" onclick="showExpl(4,'L')">4</span></span> pm. £<span class="ans-mark"><span class="ans-txt">45</span><span class="qmk" onclick="showExpl(5,'L')">5</span></span>/month. Bring own <span class="ans-mark"><span class="ans-txt">goggles</span><span class="qmk" onclick="showExpl(6,'L')">6</span></span>.<br>
+<span class="spkr">REC:</span> We're on <span class="ans-mark"><span class="ans-txt">Park</span><span class="qmk" onclick="showExpl(7,'L')">7</span></span> Avenue. Parking: <span class="ans-mark"><span class="ans-txt">80</span><span class="qmk" onclick="showExpl(8,'L')">8</span></span> cars. Weekend <span class="ans-mark"><span class="ans-txt">family</span><span class="qmk" onclick="showExpl(9,'L')">9</span></span> swim too. Phone: 07854 <span class="ans-mark"><span class="ans-txt">339 102</span><span class="qmk" onclick="showExpl(10,'L')">10</span></span>.`,
+   qs:[
+    {n:1,t:'gap',text:'Name: Daniel _______',ans:'Roberts',alt:[],why:'Caller says "Daniel Roberts".',quote:'"Daniel Roberts"'},
+    {n:2,t:'gap',text:'Activity: _______ classes',ans:'swimming',alt:[],why:'Caller asks about swimming.',quote:'"Swimming classes please"'},
+    {n:3,t:'gap',text:'Days: Tuesday and _______',ans:'Thursday',alt:[],why:'Both days stated.',quote:'"Tuesday and Thursday"'},
+    {n:4,t:'gap',text:'Start time: _______ pm',ans:'7:15',alt:['7.15','seven fifteen'],why:'Time given by receptionist.',quote:'"7:15 pm"'},
+    {n:5,t:'gap',text:'Monthly cost: £_______',ans:'45',alt:['forty-five'],why:'Monthly fee stated.',quote:'"£45/month"'},
+    {n:6,t:'gap',text:'Bring own _______',ans:'goggles',alt:[],why:'Goggles not provided.',quote:'"Bring own goggles"'},
+    {n:7,t:'gap',text:'Location: _______ Avenue',ans:'Park',alt:[],why:'Street name given.',quote:'"Park Avenue"'},
+    {n:8,t:'gap',text:'Parking: _______ cars',ans:'80',alt:['eighty'],why:'Capacity given.',quote:'"80 cars"'},
+    {n:9,t:'gap',text:'Weekend: _______ swim',ans:'family',alt:[],why:'Family sessions mentioned.',quote:'"family swim"'},
+    {n:10,t:'gap',text:'Phone: 07854 _______',ans:'339 102',alt:['339102'],why:'Number dictated.',quote:'"339 102"'},
+   ]},
+  {n:2,title:'Section 2',ctx:'A tour guide at the National Maritime Museum.',dur:280,
+   trans:`<span class="spkr">GUIDE:</span> Welcome! We have <span class="ans-mark"><span class="ans-txt">four</span><span class="qmk" onclick="showExpl(11,'L')">11</span></span> galleries. First: Age of <span class="ans-mark"><span class="ans-txt">Discovery</span><span class="qmk" onclick="showExpl(12,'L')">12</span></span>. Third: <span class="ans-mark"><span class="ans-txt">steam</span><span class="qmk" onclick="showExpl(13,'L')">13</span></span> power.<br>
+No photography gallery <span class="ans-mark"><span class="ans-txt">two</span><span class="qmk" onclick="showExpl(14,'L')">14</span></span>. Café until <span class="ans-mark"><span class="ans-txt">4 pm</span><span class="qmk" onclick="showExpl(15,'L')">15</span></span>. Lift: <span class="ans-mark"><span class="ans-txt">step-free</span><span class="qmk" onclick="showExpl(16,'L')">16</span></span> access. Famous exhibit: HMS <span class="ans-mark"><span class="ans-txt">Victory</span><span class="qmk" onclick="showExpl(20,'L')">20</span></span>.`,
+   qs:[
+    {n:11,t:'gap',text:'Number of galleries: _______',ans:'four',alt:['4'],why:'Four galleries stated.',quote:'"four galleries"'},
+    {n:12,t:'gap',text:'First gallery: Age of _______',ans:'Discovery',alt:[],why:'Name given directly.',quote:'"Age of Discovery"'},
+    {n:13,t:'gap',text:'Third gallery: _______ power',ans:'steam',alt:[],why:'Third gallery theme.',quote:'"steam power"'},
+    {n:14,t:'gap',text:'No photography: gallery _______',ans:'two',alt:['2'],why:'Exception stated.',quote:'"gallery two"'},
+    {n:15,t:'gap',text:'Café until _______',ans:'4 pm',alt:['4pm','four pm'],why:'Closing time given.',quote:'"4 pm"'},
+    {n:16,t:'gap',text:'Lift: _______ access',ans:'step-free',alt:['step free'],why:'Accessibility feature.',quote:'"step-free access"'},
+    {n:17,t:'mcq',text:'Info desk location:',opts:['A. Directly opposite entrance','B. Left of entrance','C. Behind gift shop','D. Next to lift'],ans:'A',why:'Directly opposite entrance.',quote:'"directly opposite entrance"'},
+    {n:18,t:'mcq',text:'Cloakroom:',opts:['A. Right of info desk','B. Left of info desk','C. Inside gift shop','D. Next to café'],ans:'B',why:'Left of information desk.',quote:'"left of the information desk"'},
+    {n:19,t:'mcq',text:'Café entrance:',opts:['A. Next to cloakroom','B. Front of gift shop','C. Back of gift shop','D. Opposite lift'],ans:'C',why:'At the back of the gift shop.',quote:'"back of gift shop"'},
+    {n:20,t:'gap',text:'Famous exhibit: HMS _______',ans:'Victory',alt:[],why:'Named by guide.',quote:'"HMS Victory"'},
+   ]},
+  {n:3,title:'Section 3',ctx:'Tutor and students discussing urban green spaces research.',dur:290,
+   trans:`<span class="spkr">MAYA:</span> <span class="ans-mark"><span class="ans-txt">mental</span><span class="qmk" onclick="showExpl(21,'L')">21</span></span> health impact surprised us. Small <span class="ans-mark"><span class="ans-txt">sample size</span><span class="qmk" onclick="showExpl(22,'L')">22</span></span> — only 200 people.<br>
+<span class="spkr">DANIEL:</span> Need <span class="ans-mark"><span class="ans-txt">comparative</span><span class="qmk" onclick="showExpl(23,'L')">23</span></span> studies. Maya: <span class="ans-mark"><span class="ans-txt">equitable</span><span class="qmk" onclick="showExpl(24,'L')">24</span></span> distribution. Daniel: <span class="ans-mark"><span class="ans-txt">maintenance budget</span><span class="qmk" onclick="showExpl(25,'L')">25</span></span>.<br>
+<span class="spkr">MAYA:</span> Roberts: <span class="ans-mark"><span class="ans-txt">twelve</span><span class="qmk" onclick="showExpl(27,'L')">27</span></span> cities, <span class="ans-mark"><span class="ans-txt">self-reported</span><span class="qmk" onclick="showExpl(28,'L')">28</span></span> data. Better: <span class="ans-mark"><span class="ans-txt">direct observation</span><span class="qmk" onclick="showExpl(29,'L')">29</span></span>. Focus: <span class="ans-mark"><span class="ans-txt">policy</span><span class="qmk" onclick="showExpl(30,'L')">30</span></span> implications.`,
+   qs:[
+    {n:21,t:'gap',text:'Impact on _______ health',ans:'mental',alt:[],why:'Maya states mental health.',quote:'"mental health impact"'},
+    {n:22,t:'gap',text:'Small _______',ans:'sample size',alt:['sample'],why:'Methodology issue.',quote:'"small sample size"'},
+    {n:23,t:'gap',text:'_______ studies needed',ans:'comparative',alt:[],why:'Daniel\'s suggestion.',quote:'"comparative studies"'},
+    {n:24,t:'gap',text:'Maya: _______ distribution',ans:'equitable',alt:[],why:'Maya\'s priority.',quote:'"equitable distribution"'},
+    {n:25,t:'gap',text:'Daniel: _______',ans:'maintenance budget',alt:[],why:'Daniel\'s priority.',quote:'"maintenance budget"'},
+    {n:26,t:'mcq',text:'Why cite Roberts?',opts:['A. Tutor\'s colleague','B. Most comprehensive','C. Birmingham only','D. Most recent'],ans:'B',why:'Most comprehensive framework.',quote:'"most comprehensive"'},
+    {n:27,t:'gap',text:'Roberts: _______ cities',ans:'twelve',alt:['12'],why:'Number stated.',quote:'"twelve cities"'},
+    {n:28,t:'gap',text:'Weakness: _______ data',ans:'self-reported',alt:['self reported'],why:'Weakness identified.',quote:'"self-reported data"'},
+    {n:29,t:'gap',text:'Combine surveys with _______',ans:'direct observation',alt:[],why:'Maya\'s improvement.',quote:'"direct observation"'},
+    {n:30,t:'gap',text:'Focus: _______ implications',ans:'policy',alt:[],why:'Tutor\'s guidance.',quote:'"policy implications"'},
+   ]},
+  {n:4,title:'Section 4',ctx:'Academic lecture on global coffee cultivation.',dur:310,
+   trans:`<span class="spkr">LECTURER:</span> Coffee: world's <span class="ans-mark"><span class="ans-txt">second</span><span class="qmk" onclick="showExpl(31,'L')">31</span></span> most traded. First cultivated: <span class="ans-mark"><span class="ans-txt">Ethiopia</span><span class="qmk" onclick="showExpl(32,'L')">32</span></span>. Spread to <span class="ans-mark"><span class="ans-txt">Egypt</span><span class="qmk" onclick="showExpl(33,'L')">33</span></span>.<br>
+Portugal → <span class="ans-mark"><span class="ans-txt">Brazil</span><span class="qmk" onclick="showExpl(34,'L')">34</span></span> (<span class="ans-mark"><span class="ans-txt">40</span><span class="qmk" onclick="showExpl(35,'L')">35</span></span>%). Species: <span class="ans-mark"><span class="ans-txt">Arabica</span><span class="qmk" onclick="showExpl(36,'L')">36</span></span> (60%), Robusta (2× <span class="ans-mark"><span class="ans-txt">caffeine</span><span class="qmk" onclick="showExpl(37,'L')">37</span></span>).<br>
+By 2050: Arabica -<span class="ans-mark"><span class="ans-txt">50</span><span class="qmk" onclick="showExpl(38,'L')">38</span></span>%. Developing <span class="ans-mark"><span class="ans-txt">resilient</span><span class="qmk" onclick="showExpl(39,'L')">39</span></span> varieties. Challenge: price <span class="ans-mark"><span class="ans-txt">volatility</span><span class="qmk" onclick="showExpl(40,'L')">40</span></span>.`,
+   qs:[
+    {n:31,t:'gap',text:'_______ most traded',ans:'second',alt:['2nd'],why:'Opening fact.',quote:'"second most traded"'},
+    {n:32,t:'gap',text:'First cultivated: _______',ans:'Ethiopia',alt:[],why:'Origin country.',quote:'"Ethiopia"'},
+    {n:33,t:'gap',text:'Spread to _______',ans:'Egypt',alt:[],why:'First spread location.',quote:'"Egypt"'},
+    {n:34,t:'gap',text:'Portugal planted in _______',ans:'Brazil',alt:[],why:'Colonial history.',quote:'"Brazil"'},
+    {n:35,t:'gap',text:'Brazil: _______ %',ans:'40',alt:['forty'],why:'Market share.',quote:'"40%"'},
+    {n:36,t:'gap',text:'Main species: _______',ans:'Arabica',alt:[],why:'Dominant species.',quote:'"Arabica (60%)"'},
+    {n:37,t:'gap',text:'Robusta: double _______',ans:'caffeine',alt:[],why:'Chemical comparison.',quote:'"2× caffeine"'},
+    {n:38,t:'gap',text:'Arabica may fall _______ %',ans:'50',alt:['fifty'],why:'Climate projection.',quote:'"50%"'},
+    {n:39,t:'gap',text:'Developing _______ varieties',ans:'resilient',alt:[],why:'Response to climate.',quote:'"resilient varieties"'},
+    {n:40,t:'gap',text:'Challenge: price _______',ans:'volatility',alt:[],why:'Key challenge.',quote:'"price volatility"'},
+   ]},
+]};
+
+// ══════════════════════════
+// LISTENING RENDER
+// ══════════════════════════
+function renderListening(secNum){
+  curSec=secNum;
+  [1,2,3,4].forEach(n=>{document.getElementById('stab'+n).classList.toggle('active',n===secNum);});
+  document.getElementById('sectionInfo').textContent=`Section ${secNum} of 4`;
+  const sec=LD.sections[secNum-1];
+  transcriptVisible=false;
+  const tt=document.getElementById('transTgl');if(tt){tt.textContent='📜 Show Transcript';tt.classList.remove('on');}
+  const left=document.getElementById('leftPanel');
+  left.classList.remove('show-ans');delete left.dataset.wrapped;
+  left.innerHTML=`
+    <div class="pass-label">${sec.title}</div>
+    <div class="pass-title" style="font-size:16px;">Audio Transcript</div>
+    <div class="pass-sub">${sec.ctx}</div>
+    <button class="ans-btn" id="ansRevBtn" onclick="toggleAnsRev('leftPanel','ansRevBtn')">👁 Show Answers</button>
+    <div id="transContent" class="trans-panel hidden">${sec.trans}</div>
+    <div id="transHidden" style="background:#f0f7ff;border-radius:6px;padding:12px;border-left:3px solid var(--blue);font-size:12.5px;color:var(--dark);">
+      📜 Transcript hidden — click <strong>"Show Transcript"</strong> in the audio bar above to view.<br>💡 Click any word for AI explanation.
+    </div>
+  `;
+  const gapQs=sec.qs.filter(q=>q.t==='gap'),mcqQs=sec.qs.filter(q=>q.t==='mcq');
+  let html=`<div class="instructions"><strong>${sec.title}</strong> — Questions ${sec.qs[0].n}–${sec.qs[sec.qs.length-1].n}. Audio plays once. Answers shown after submit.</div>`;
+  if(gapQs.length){
+    html+=`<div class="q-group"><div class="q-group-header">Questions ${gapQs[0].n}–${gapQs[gapQs.length-1].n}</div><div class="q-group-instr">Complete the notes. Write <em>NO MORE THAN TWO WORDS AND/OR A NUMBER</em>.</div>`;
+    gapQs.forEach(q=>{const v=userAnswers[q.n]||'';const inp=`<input id="q${q.n}" value="${v}" oninput="saveAns(${q.n},this.value)" autocomplete="off">`;
+    html+=`<div class="q-row"><div class="qnb">${q.n}</div><div class="q-text">${q.text.replace('_______',inp)}<span class="ei" onclick="showExpl(${q.n},'L')">ⓘ</span></div></div><div class="q-ar" id="ar${q.n}"></div>`;});
+    html+=`</div>`;
+  }
+  if(mcqQs.length){
+    html+=`<div class="q-group"><div class="q-group-header">Questions ${mcqQs[0].n}–${mcqQs[mcqQs.length-1].n}</div><div class="q-group-instr">Choose <em>A–D</em>.</div>`;
+    mcqQs.forEach(q=>{const sel=userAnswers[q.n];
+    html+=`<div class="q-row"><div class="qnb">${q.n}</div><div class="q-text">${q.text}<span class="ei" onclick="showExpl(${q.n},'L')">ⓘ</span>
+      <div class="mcq-options">${q.opts.map(o=>{const l=o.charAt(0);return`<div class="mcq-opt ${sel===l?'sel':''}" onclick="selMCQ(${q.n},'${l}',this)"><span class="mcl">${l}</span>${o.slice(2)}</div>`;}).join('')}</div></div></div><div class="q-ar" id="ar${q.n}"></div>`;});
+    html+=`</div>`;
+  }
+  document.getElementById('rightPanel').innerHTML=html;
+  updateAudioFor(secNum);updateSecStatus();updateQGrid();
+  if(submittedMods.listening)revealAnswers('L');
+}
+
+function toggleTranscript(){
+  transcriptVisible=!transcriptVisible;
+  const tc=document.getElementById('transContent'),th=document.getElementById('transHidden');
+  const btn=document.getElementById('transTgl');
+  if(tc)tc.classList.toggle('hidden',!transcriptVisible);
+  if(th)th.style.display=transcriptVisible?'none':'block';
+  if(btn){btn.textContent=transcriptVisible?'📜 Hide Transcript':'📜 Show Transcript';btn.classList.toggle('on',transcriptVisible);}
+  if(transcriptVisible){const tc2=document.getElementById('transContent');if(tc2)wrapWords(tc2);}
+}
+
+function toggleAnsRev(panelId,btnId){
+  const panel=document.getElementById(panelId);const btn=document.getElementById(btnId);
+  const on=panel.classList.toggle('show-ans');
+  if(btn){btn.classList.toggle('on',on);btn.textContent=on?'🔴 Hide Answers':'👁 Show Answers';}
+}
+function switchSec(n){renderListening(n);}
+function updateAudioFor(secNum){
+  const sec=LD.sections[secNum-1];audioElapsed=0;
+  document.getElementById('audioDur').textContent=fmt(sec.dur);
+  document.getElementById('audioCurrent').textContent='0:00';
+  document.getElementById('audioFill').style.width='0%';
+  document.getElementById('audioLbl').textContent=sec.title;
+  if(audioPlaying)togglePlay();
+}
+function togglePlay(){
+  const sec=LD.sections[curSec-1];
+  if(audioPlaying){audioPlaying=false;clearInterval(audioInterval);document.getElementById('playBtn').textContent='▶';if(window.speechSynthesis)window.speechSynthesis.cancel();}
+  else{
+    if(audioElapsed>=sec.dur)audioElapsed=0;audioPlaying=true;document.getElementById('playBtn').textContent='⏸';
+    if(window.speechSynthesis){window.speechSynthesis.cancel();const plain=sec.trans.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');const u=new SpeechSynthesisUtterance(plain);u.rate=0.95*playSpeed;const v=window.speechSynthesis.getVoices();const brit=v.find(x=>x.lang.startsWith('en-GB'))||v.find(x=>x.lang.startsWith('en'));if(brit)u.voice=brit;window.speechSynthesis.speak(u);}
+    audioInterval=setInterval(()=>{audioElapsed+=playSpeed;if(audioElapsed>=sec.dur){audioElapsed=sec.dur;audioPlaying=false;clearInterval(audioInterval);document.getElementById('playBtn').textContent='▶';}document.getElementById('audioCurrent').textContent=fmt(audioElapsed);document.getElementById('audioFill').style.width=(audioElapsed/sec.dur*100)+'%';},1000);
+  }
+}
+function seekAudio(e){const r=e.currentTarget.getBoundingClientRect();const pct=(e.clientX-r.left)/r.width;audioElapsed=Math.floor(pct*LD.sections[curSec-1].dur);document.getElementById('audioCurrent').textContent=fmt(audioElapsed);document.getElementById('audioFill').style.width=(pct*100)+'%';}
+function cycleSpeed(){const sp=[0.75,1,1.25,1.5];playSpeed=sp[(sp.indexOf(playSpeed)+1)%sp.length];document.getElementById('speedBtn').textContent=playSpeed+'×';}
+function fmt(s){return`${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;}
+function updateSecStatus(){LD.sections.forEach(sec=>{const a=sec.qs.filter(q=>userAnswers[q.n]).length;const lbl=document.getElementById('ss'+sec.n);if(lbl)lbl.textContent=a===0?'':(a===sec.qs.length?'✓':`(${a}/${sec.qs.length})`);});}
+
+// ══════════════════════════
+// READING DATA — 4 Passages
+// ══════════════════════════
+const RD=[
+  {label:'PASSAGE 1',title:'The Kākāpō: Saving the World\'s Strangest Parrot',sub:'A study of conservation efforts for a critically endangered species',
+   paras:[
+    {p:'A',t:'New Zealand is home to some of the world\'s most unusual wildlife, but few animals are as extraordinary as the Kākāpō. A large, flightless parrot with distinctive mossy-green plumage, the Kākāpō holds the remarkable distinction of being the world\'s only flightless parrot. Adult males can weigh up to four kilograms, making it the world\'s heaviest parrot.'},
+    {p:'B',t:'The Kākāpō is a nocturnal creature, active only at night. During the day, it rests in burrows, camouflaged by its green-brown feathers. It is also solitary by nature — individuals live alone across large territories and rarely interact except during the breeding season.'},
+    {p:'C',t:'European settlers introduced predators such as rats, stoats, and cats. A Kākāpō\'s natural defence is to freeze and rely on camouflage — disastrous against mammals hunting by smell. Introduced predators eradicated the Kākāpō from most of New Zealand.'},
+    {p:'D',t:'The Kākāpō breeds only in years when certain trees produce an abundance of fruit — possibly once every two to five years. Males inflate a chest sac and produce booming calls. Females alone build nests, incubate the eggs, and feed the chicks.'},
+    {p:'E',t:'By 1995, only 51 Kākāpō remained. The New Zealand government launched the Kākāpō Recovery Programme, relocating all surviving birds to predator-free offshore islands.'},
+    {p:'F',t:'Every Kākāpō is fitted with a radio transmitter so its movements can be monitored around the clock. By 2023, the population had grown to over 200 individuals — a fourfold increase.'},
+   ],
+   qs:[
+    {n:1,t:'tfng',text:'There are several other species of flightless parrots worldwide.',ans:'FALSE',why:'Para A: "the world\'s only flightless parrot" directly contradicts the statement.',quote:'"the world\'s only flightless parrot"'},
+    {n:2,t:'tfng',text:'The Kākāpō breeds every year without exception.',ans:'FALSE',why:'Para D: breeds "only in years when certain trees produce an abundance of fruit".',quote:'"only in years when certain trees produce an abundance of fruit"'},
+    {n:3,t:'tfng',text:'Male Kākāpō help feed the chicks.',ans:'FALSE',why:'Para D: "Females alone build nests, incubate the eggs, and feed the chicks."',quote:'"Females alone... feed the chicks"'},
+    {n:4,t:'mcq',text:'Why was the Kākāpō badly affected by introduced predators?',opts:['A. It was too slow','B. Its freeze defence failed against mammals hunting by smell','C. It never learned to climb','D. Settlers hunted it directly'],ans:'B',why:'Para C: "disastrous against mammals hunting by smell".',quote:'"disastrous against mammals hunting by smell"'},
+    {n:5,t:'mcq',text:'Main aim of the Recovery Programme?',opts:['A. Zoo breeding','B. Move birds to predator-free islands','C. Teach Kākāpō to fly','D. Eradicate all mainland predators'],ans:'B',why:'Para E: "relocating all surviving birds to predator-free offshore islands".',quote:'"relocating all surviving birds to predator-free offshore islands"'},
+    {n:6,t:'gap',text:'Each Kākāpō has a _______ to track its movements.',ans:'radio transmitter',alt:['transmitter'],why:'Para F: "fitted with a radio transmitter".',quote:'"fitted with a radio transmitter"'},
+    {n:7,t:'gap',text:'By 2023, population grew to over _______ individuals.',ans:'200',alt:['two hundred'],why:'Para F: "over 200 individuals".',quote:'"over 200 individuals"'},
+   ]},
+  {label:'PASSAGE 2',title:'The Rise of Remote Work',sub:'How the pandemic transformed working patterns globally',
+   paras:[
+    {p:'A',t:'Before 2020, remote working was practised by a minority of workers, mainly in technology and finance. Most employers considered office presence essential for productivity and collaboration. The idea of widespread home working was viewed as impractical.'},
+    {p:'B',t:'The COVID-19 pandemic changed everything. Lockdowns forced organisations to switch to remote work within days. By April 2020, an estimated 40% of the UK workforce was working from home, compared to just 5% before the pandemic.'},
+    {p:'C',t:'Many workers reported higher productivity at home, citing fewer interruptions and no commuting time. A 2021 Stanford University study found remote workers were 13% more productive than their office-based counterparts.'},
+    {p:'D',t:'However, remote work brought challenges. Social isolation, difficulty separating work from personal life, and missed informal collaboration were common problems. Junior employees particularly reported missing mentorship opportunities.'},
+    {p:'E',t:'As restrictions lifted, many companies adopted hybrid working models — combining office and remote work. Technology companies such as Twitter and Spotify announced permanent remote-work options.'},
+    {p:'F',t:'The shift also had geographic consequences. With employees freed from commuting, many relocated from expensive cities to smaller towns, driving up property prices in previously affordable regions.'},
+   ],
+   qs:[
+    {n:8,t:'tfng',text:'Before 2020, most employers considered office presence essential.',ans:'TRUE',why:'Para A directly states this.',quote:'"Most employers considered office presence essential"'},
+    {n:9,t:'tfng',text:'The pandemic forced companies to switch to remote work within days.',ans:'TRUE',why:'Para B: "switch to remote work within days".',quote:'"switch to remote work within days"'},
+    {n:10,t:'tfng',text:'All workers reported higher productivity working from home.',ans:'FALSE',why:'Para C says "many workers" not all. Para D describes challenges.',quote:'"Many workers reported higher productivity"'},
+    {n:11,t:'mcq',text:'The Stanford 2021 study found remote workers were:',opts:['A. 10% more productive','B. 13% more productive','C. 13% less productive','D. 20% more productive'],ans:'B',why:'Para C: "13% more productive than their office-based counterparts".',quote:'"13% more productive"'},
+    {n:12,t:'mcq',text:'Which group missed mentorship opportunities?',opts:['A. Senior managers','B. Technology workers','C. Junior employees','D. Hybrid workers'],ans:'C',why:'Para D: "Junior employees particularly reported missing mentorship".',quote:'"Junior employees... missing mentorship opportunities"'},
+    {n:13,t:'gap',text:'Stanford found remote workers were _______ % more productive.',ans:'13',alt:['thirteen'],why:'Para C: "13% more productive".',quote:'"13% more productive"'},
+    {n:14,t:'gap',text:'Companies adopted _______ working models after the pandemic.',ans:'hybrid',alt:[],why:'Para E: "hybrid working models".',quote:'"hybrid working models"'},
+   ]},
+  {label:'PASSAGE 3',title:'Artificial Intelligence in Medicine',sub:'How machine learning is transforming healthcare diagnostics',
+   paras:[
+    {p:'A',t:'Artificial intelligence (AI) is rapidly transforming medicine. Machine learning algorithms are being applied to tasks once reserved for specialists — from diagnosing cancer to predicting patient deterioration in intensive care.'},
+    {p:'B',t:'One promising application is medical imaging. In 2020, a Nature Medicine study found an AI system diagnosed breast cancer from mammograms more accurately than six radiologists working independently.'},
+    {p:'C',t:'AI is also accelerating drug discovery. In 2020, AlphaFold, developed by DeepMind, solved a 50-year-old biological problem by accurately predicting protein structures — a breakthrough that could transform medicine.'},
+    {p:'D',t:'Despite progress, challenges remain. AI trained on data from specific populations may perform poorly with different demographic groups, raising concerns about bias and health inequity. Questions about regulatory approval and liability also persist.'},
+    {p:'E',t:'Most doctors do not view AI as a replacement for clinical judgment, but as a tool to handle routine analysis and flag urgent cases, freeing clinicians to focus on complex decision-making. The human-AI partnership is now widely regarded as most effective.'},
+    {p:'F',t:'Experts predict AI will play an increasingly central role in personalised medicine — tailoring treatments to individual patients. As the saying goes: AI will not replace doctors, but doctors who use AI will replace those who do not.'},
+   ],
+   qs:[
+    {n:15,t:'tfng',text:'AI can currently diagnose all diseases more accurately than human doctors.',ans:'NOT GIVEN',why:'The passage describes specific cases but does not claim universal superiority.',quote:'"rival and sometimes exceed human expertise"'},
+    {n:16,t:'tfng',text:'The 2020 Nature Medicine study found AI outperformed radiologists at breast cancer diagnosis.',ans:'TRUE',why:'Para B: "more accurately than six radiologists".',quote:'"more accurately than six radiologists"'},
+    {n:17,t:'tfng',text:'AlphaFold solved a 50-year-old problem in 2020.',ans:'TRUE',why:'Para C: "In 2020, AlphaFold... solved a 50-year-old biological problem".',quote:'"In 2020, AlphaFold... solved a 50-year-old biological problem"'},
+    {n:18,t:'mcq',text:'A key concern about AI trained on specific populations:',opts:['A. High cost','B. Bias and health inequity','C. Slow processing','D. Inaccuracy'],ans:'B',why:'Para D: "concerns about bias and health inequity".',quote:'"concerns about bias and health inequity"'},
+    {n:19,t:'mcq',text:'How do most doctors view AI?',opts:['A. A full replacement','B. A threat to jobs','C. A tool for routine tasks','D. Not useful in medicine'],ans:'C',why:'Para E: "a tool to handle routine analysis".',quote:'"a tool to handle routine analysis"'},
+    {n:20,t:'gap',text:'AlphaFold solved a _______ -year-old problem in biology.',ans:'50',alt:['fifty'],why:'Para C: "50-year-old biological problem".',quote:'"50-year-old biological problem"'},
+    {n:21,t:'gap',text:'The _______ medicine model tailors treatment to individuals.',ans:'personalised',alt:['personalized'],why:'Para F: "personalised medicine".',quote:'"personalised medicine"'},
+   ]},
+  {label:'PASSAGE 4',title:'Ocean Plastic Pollution',sub:'The global crisis of plastic waste in the world\'s oceans',
+   paras:[
+    {p:'A',t:'Each year, approximately eight million metric tonnes of plastic enter the world\'s oceans — the equivalent of a rubbish truck per minute. Plastic pollution now affects more than 800 species of marine animals through entanglement, ingestion, and habitat disruption.'},
+    {p:'B',t:'Beyond large pieces, microplastics — particles smaller than five millimetres — pose an insidious problem. They form when larger plastics are broken down by sunlight and wave action, and have been found in the deepest ocean trenches and in Arctic sea ice.'},
+    {p:'C',t:'Sea turtles frequently mistake plastic bags for jellyfish. Seabirds feed plastic fragments to their chicks, causing starvation. Fish absorbing microplastics experience hormonal disruption and impaired reproduction.'},
+    {p:'D',t:'Human health is also a concern. Seafood consumers ingest approximately 11,000 microplastic particles per year. Microplastics have been detected in human blood, lung tissue, and placental tissue. Long-term effects are not yet fully understood.'},
+    {p:'E',t:'Single-use plastic bans have been introduced in over 60 countries. International agreements such as the Global Plastics Treaty aim to set binding targets for plastic production and disposal.'},
+    {p:'F',t:'Ocean cleanup systems — large floating barriers — have been deployed in the Pacific. Biodegradable alternatives are expanding. However, experts emphasise that technological fixes alone cannot solve the crisis without fundamental changes to consumption patterns.'},
+   ],
+   qs:[
+    {n:22,t:'tfng',text:'Eight million metric tonnes of plastic enter the oceans annually.',ans:'TRUE',why:'Para A states this figure directly.',quote:'"approximately eight million metric tonnes"'},
+    {n:23,t:'tfng',text:'Microplastics are larger than five millimetres.',ans:'FALSE',why:'Para B: "smaller than five millimetres".',quote:'"smaller than five millimetres"'},
+    {n:24,t:'tfng',text:'The long-term health effects of microplastics are fully understood.',ans:'FALSE',why:'Para D: "not yet fully understood".',quote:'"not yet fully understood"'},
+    {n:25,t:'mcq',text:'Which animal mistakes plastic bags for jellyfish?',opts:['A. Seabirds','B. Mussels','C. Sea turtles','D. Fish'],ans:'C',why:'Para C: "Sea turtles frequently mistake plastic bags for jellyfish".',quote:'"Sea turtles frequently mistake plastic bags for jellyfish"'},
+    {n:26,t:'mcq',text:'Single-use plastic bans have been introduced in over:',opts:['A. 20 countries','B. 40 countries','C. 60 countries','D. 80 countries'],ans:'C',why:'Para E: "over 60 countries".',quote:'"over 60 countries"'},
+    {n:27,t:'gap',text:'Seafood consumers ingest about _______ microplastic particles per year.',ans:'11,000',alt:['11000','eleven thousand'],why:'Para D: "approximately 11,000 microplastic particles per year".',quote:'"approximately 11,000 microplastic particles per year"'},
+    {n:28,t:'gap',text:'Ocean cleanup systems use large floating _______ to collect plastic.',ans:'barriers',alt:[],why:'Para F: "large floating barriers".',quote:'"large floating barriers"'},
+   ]},
+];
+
+function renderReading(){
+  document.getElementById('sectionInfo').textContent=`Passage ${curPassIdx+1} of 4`;
+  [0,1,2,3].forEach(i=>{const b=document.getElementById('ptab'+i);if(b)b.classList.toggle('active',i===curPassIdx);});
+  const pass=RD[curPassIdx];
+  const left=document.getElementById('leftPanel');
+  delete left.dataset.wrapped;
+  left.innerHTML=`
+    <div class="pass-label">${pass.label}</div>
+    <div class="pass-title">${pass.title}</div>
+    <div class="pass-sub">${pass.sub}</div>
+    <div class="pass-divider"></div>
+    <button class="ans-btn" id="rAnsBtn" onclick="toggleAnsRev('leftPanel','rAnsBtn')">👁 Show Answers</button>
+    <div class="pass-body" id="passBody">${pass.paras.map(p=>`<p><span class="para-lbl">${p.p}</span>${p.t}</p>`).join('')}</div>
+  `;
+  wrapWords(document.getElementById('passBody'));
+  const tfQs=pass.qs.filter(q=>q.t==='tfng'),mcQs=pass.qs.filter(q=>q.t==='mcq'),gpQs=pass.qs.filter(q=>q.t==='gap');
+  let html=`<div class="instructions"><strong>${pass.label}</strong> — Questions ${pass.qs[0].n}–${pass.qs[pass.qs.length-1].n}. Answers shown after submit. 💡 Click any word for AI explanation.</div>`;
+  if(tfQs.length){
+    html+=`<div class="q-group"><div class="q-group-header">Questions ${tfQs[0].n}–${tfQs[tfQs.length-1].n}</div><div class="q-group-instr">Write <em>TRUE</em>, <em>FALSE</em>, or <em>NOT GIVEN</em>.</div>`;
+    tfQs.forEach(q=>{html+=`<div class="q-row"><div class="qnb">${q.n}</div><div class="q-text">${q.text}<span class="ei" onclick="showExpl(${q.n},'R')">ⓘ</span>
+      <div class="opt-row" style="width:100%;margin-top:4px;">${['TRUE','FALSE','NOT GIVEN'].map(o=>`<button class="opt ${userAnswers[q.n]===o?'sel':''}" onclick="selTFNG(${q.n},'${o}',this)">${o}</button>`).join('')}</div></div></div>
+      <div class="q-ar" id="ar${q.n}"></div>`;});html+=`</div>`;}
+  if(mcQs.length){
+    html+=`<div class="q-group"><div class="q-group-header">Questions ${mcQs[0].n}–${mcQs[mcQs.length-1].n}</div><div class="q-group-instr">Choose <em>A–D</em>.</div>`;
+    mcQs.forEach(q=>{const sel=userAnswers[q.n];html+=`<div class="q-row"><div class="qnb">${q.n}</div><div class="q-text">${q.text}<span class="ei" onclick="showExpl(${q.n},'R')">ⓘ</span>
+      <div class="mcq-options">${q.opts.map(o=>{const l=o.charAt(0);return`<div class="mcq-opt ${sel===l?'sel':''}" onclick="selMCQ(${q.n},'${l}',this)"><span class="mcl">${l}</span>${o.slice(2)}</div>`;}).join('')}</div></div></div><div class="q-ar" id="ar${q.n}"></div>`;});html+=`</div>`;}
+  if(gpQs.length){
+    html+=`<div class="q-group"><div class="q-group-header">Questions ${gpQs[0].n}–${gpQs[gpQs.length-1].n}</div><div class="q-group-instr">Write <em>NO MORE THAN TWO WORDS</em>.</div>`;
+    gpQs.forEach(q=>{const v=userAnswers[q.n]||'';const inp=`<input id="q${q.n}" value="${v}" oninput="saveAns(${q.n},this.value)" autocomplete="off">`;
+    html+=`<div class="q-row"><div class="qnb">${q.n}</div><div class="q-text">${q.text.replace('_______',inp)}<span class="ei" onclick="showExpl(${q.n},'R')">ⓘ</span></div></div><div class="q-ar" id="ar${q.n}"></div>`;});html+=`</div>`;}
+  document.getElementById('rightPanel').innerHTML=html;updateQGrid();
+  if(submittedMods.reading)revealAnswers('R');
+}
+function switchPassage(idx){curPassIdx=idx;renderReading();}
+
+// ══════════════════════════
+// WRITING
+// ══════════════════════════
+const WD=[
+  {title:'Academic Writing Task 1',timer:'Task 1 — 20 min',min:150,
+   prompt:'The bar chart below shows the percentage of students studying different subjects at a UK university in 2000 and 2020. Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.',
+   tips:['Open with an overview — state the main trend clearly','Use specific data (%, years) to support each point','Use comparison language: whereas, while, compared to, in contrast','Do NOT give your opinion — just describe the data','Organise by most significant feature first']},
+  {title:'Academic Writing Task 2',timer:'Task 2 — 40 min',min:250,
+   prompt:'Some people believe that technology has made our lives too complicated. To what extent do you agree or disagree? Give reasons and relevant examples. Write at least 250 words.',
+   tips:['Clear thesis statement in introduction','One main idea per body paragraph + a specific example','Acknowledge the opposite view','Strong conclusion restating your position','Aim for 4–5 paragraphs total']},
+];
+function renderWriting(){
+  document.getElementById('sectionInfo').textContent=curWriteTask===0?'Writing Task 1':'Writing Task 2';
+  const t=WD[curWriteTask];
+  document.getElementById('leftPanel').innerHTML=`
+    <div class="pass-label">IELTS ACADEMIC WRITING</div>
+    <div class="pass-title" style="font-size:15px;">${t.title}</div>
+    <div class="pass-sub">${curWriteTask===0?'20':'40'} minutes on this task</div>
+    <div class="pass-divider"></div>
+    <div style="display:flex;gap:6px;margin-bottom:11px;">
+      <button class="chip ${curWriteTask===0?'active':''}" onclick="setWT(0)">Task 1 — Graph</button>
+      <button class="chip ${curWriteTask===1?'active':''}" onclick="setWT(1)">Task 2 — Essay</button>
+    </div>
+    <div class="write-prompt"><strong>Question:</strong><br>${t.prompt}</div>
+    <div style="background:#f0f7ff;border-radius:6px;padding:10px 13px;border-left:3px solid var(--blue);margin-top:10px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;">🎯 British Council 4 Criteria</div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.8;">📌 <strong>Task Response</strong><br>📌 <strong>Coherence & Cohesion</strong><br>📌 <strong>Lexical Resource</strong><br>📌 <strong>Grammatical Range</strong></div>
+    </div>
+    <div style="background:#fffbdb;border-radius:6px;padding:10px 13px;border-left:3px solid var(--orange);margin-top:8px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">💡 Tips</div>
+      <ul style="list-style:none;font-size:12px;color:var(--grey);line-height:1.8;">${t.tips.map(tp=>`<li>✦ ${tp}</li>`).join('')}</ul>
+    </div>
+  `;
+  document.getElementById('rightPanel').innerHTML=`
+    <div class="instructions">Minimum ${t.min} words. Use AI feedback when ready.</div>
+    <textarea id="writeText" style="min-height:260px;" placeholder="Start writing here..." oninput="updateWC()"></textarea>
+    <div class="wc" id="writeWC">Words: 0 / ${t.min} minimum</div>
+    <button class="nav-btn" style="background:var(--blue);" onclick="getWFB()" id="wBtn">🤖 Get AI Feedback</button>
+    <div class="fb-box" id="wFb"></div>
+  `;
+}
+function setWT(i){curWriteTask=i;renderWriting();}
+function updateWC(){const t=document.getElementById('writeText');if(!t)return;const c=t.value.trim()?t.value.trim().split(/\s+/).length:0;document.getElementById('writeWC').textContent=`Words: ${c} / ${WD[curWriteTask].min} minimum`;}
+async function getWFB(){
+  const text=document.getElementById('writeText').value.trim();
+  if(!text||text.split(/\s+/).length<20){alert('Please write at least 20 words first.');return;}
+  const btn=document.getElementById('wBtn');btn.innerHTML='<span class="spin"></span>Analysing...';btn.disabled=true;
+  const fb=document.getElementById('wFb');fb.className='fb-box on';fb.innerHTML='<div style="padding:8px;color:var(--grey);font-size:13px;"><span class="spin"></span> Scoring with British Council criteria...</div>';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1100,messages:[{role:'user',content:`You are an official IELTS Writing examiner (British Council trained). Evaluate this ${WD[curWriteTask].title} response.
+Question: "${WD[curWriteTask].prompt}"
+Response: "${text}"
+Reply EXACTLY:
+OVERALL_BAND: [number]
+TASK_RESPONSE: [band] | [2 sentences]
+COHERENCE_COHESION: [band] | [2 sentences]
+LEXICAL_RESOURCE: [band] | [2 sentences]
+GRAMMATICAL_RANGE: [band] | [2 sentences with errors]
+MISTAKES:
+- [exact weak phrase] → [why/correction]
+- [another phrase] → [correction]
+- [third] → [correction]
+IMPROVEMENTS:
+- [tip 1]
+- [tip 2]
+- [tip 3]
+IMPROVED_SENTENCE: [rewrite weakest sentence at Band 7+]`}]})});
+    const d=await r.json();fb.innerHTML=parseFB(d.content[0].text);
+  }catch{fb.innerHTML='<div style="padding:9px;background:#fee2e2;border-radius:6px;color:#8b1010;">Feedback unavailable.</div>';}
+  btn.innerHTML='🤖 Get AI Feedback';btn.disabled=false;
+}
+function parseFB(raw){
+  const lines=raw.split('\n').filter(l=>l.trim());let html='';let inM=false,inI=false;
+  const lbls={'TASK_RESPONSE':'Task Response','TASK_ACHIEVEMENT':'Task Achievement','COHERENCE_COHESION':'Coherence & Cohesion','LEXICAL_RESOURCE':'Lexical Resource','GRAMMATICAL_RANGE':'Grammatical Range & Accuracy','FLUENCY_COHERENCE':'Fluency & Coherence','PRONUNCIATION':'Pronunciation'};
+  lines.forEach(line=>{
+    if(line.startsWith('OVERALL_BAND:')){const sc=parseFloat(line.split(':')[1]);const cls=sc>=7.5?'band-high':sc>=6?'band-mid':'band-low';html+=`<div style="margin-bottom:9px;"><span class="band-pill ${cls}">Overall Band: ${sc}</span></div>`;inM=false;inI=false;}
+    else if(line.match(/^(TASK_RESPONSE|TASK_ACHIEVEMENT|COHERENCE_COHESION|LEXICAL_RESOURCE|GRAMMATICAL_RANGE|FLUENCY_COHERENCE|PRONUNCIATION):/)){
+      const [k,...rest]=line.split(':');const full=rest.join(':');const [band,...comment]=full.split('|');
+      html+=`<div class="fb-crit"><div class="fb-crit-lbl">${lbls[k]||k}<span class="btag">${band.trim()}</span></div><div class="fb-crit-txt">${comment.join('|').trim()}</div></div>`;inM=false;inI=false;
+    }else if(line.startsWith('MISTAKES:')){html+=`<div class="fb-mistakes"><div class="fb-mist-t">❌ Mistakes Found</div>`;inM=true;inI=false;}
+    else if(line.startsWith('IMPROVEMENTS:')){if(inM)html+=`</div>`;html+=`<div class="fb-impr"><div class="fb-impr-t">💡 How to Improve</div>`;inM=false;inI=true;}
+    else if(line.startsWith('IMPROVED_SENTENCE:')){if(inI)html+=`</div>`;html+=`<div class="fb-rwr"><div class="fb-rwr-t">✨ Band 7+ Rewrite</div><div class="fb-rwr-txt">${line.replace('IMPROVED_SENTENCE:','').trim()}</div></div>`;inM=false;inI=false;}
+    else if(line.startsWith('-')&&inM){const[orig,...reason]=line.slice(1).split('→');html+=`<div class="fb-mi"><span class="orig">"${orig.trim()}"</span>${reason.length?` → ${reason.join('→').trim()}`:''}</div>`;}
+    else if(line.startsWith('-')&&inI){html+=`<div class="fb-mi">✦ ${line.slice(1).trim()}</div>`;}
+  });
+  if(inM||inI)html+=`</div>`;return html;
+}
+
+// ══════════════════════════
+// SPEAKING
+// ══════════════════════════
+const SPD=[
+  {label:'Part 1',name:'Introduction & General Questions',tl:'4–5 min',secs:270,topic:'Tell me about where you currently live.',bullets:['What do you like most about your neighbourhood?','How long have you lived there?','Would you like to move somewhere else?'],guide:'Part 1: 4–5 minutes. Familiar questions about you, your home, work, or interests. Give full, natural answers.',tips:['Answer then expand with a reason or example','Aim for 3–5 sentences per answer','Use natural connectors: "because", "however"','Avoid memorised scripted answers'],phrases:'"To be honest, I really enjoy…"<br>"I suppose I would say…"<br>"It depends, but generally…"'},
+  {label:'Part 2',name:'Individual Long Turn (Cue Card)',tl:'3–4 min (1 min prep)',secs:180,topic:'Describe a memorable journey you have taken.',bullets:['Where you went and why','What happened during the journey','Why it was memorable'],guide:'Part 2: 1 minute to make notes from the cue card. Then speak for 1–2 minutes. Use all bullet points.',tips:['Use your prep minute well — jot 3–4 key points','Follow the cue card structure in order','Use narrative tenses (past simple, past continuous)','End with a strong sentence about why it was memorable'],phrases:'"I\'d like to talk about a trip to…"<br>"What made it memorable was…"<br>"Looking back, I realise that…"'},
+  {label:'Part 3',name:'Two-Way Discussion (Abstract)',tl:'4–5 min',secs:270,topic:'Why do people enjoy travelling to different countries?',bullets:['Main benefits of international travel?','How has travel changed in the last 20 years?','Should governments make international travel easier?'],guide:'Part 3: 4–5 minutes. Abstract questions related to Part 2. Give developed opinions with reasons and examples.',tips:['Give a clear opinion + two supporting reasons','Use sophisticated linking: "whereas", "nevertheless"','Acknowledge the opposing view','Don\'t rush — speak at a natural pace'],phrases:'"In my view, it\'s fair to say that…"<br>"There are arguments on both sides…"<br>"It could be argued that…"'},
+];
+function renderSpeaking(){
+  const p=SPD[curSpPart];spSecs=p.secs;
+  document.getElementById('sectionInfo').textContent=`Speaking — ${p.label}`;
+  document.getElementById('leftPanel').innerHTML=`
+    <div class="pass-label">IELTS SPEAKING — ${p.label}</div>
+    <div class="pass-title" style="font-size:15px;">${p.name}</div>
+    <div class="pass-sub">Duration: ${p.tl}</div>
+    <div class="pass-divider"></div>
+    <div style="display:flex;gap:6px;margin-bottom:11px;">${SPD.map((s,i)=>`<button class="chip ${i===curSpPart?'active':''}" onclick="setSpPart(${i})">${s.label}</button>`).join('')}</div>
+    <div class="speak-box">
+      <div class="sp-lbl">YOUR TOPIC</div>
+      <div class="sp-topic">${p.topic}</div>
+      <ul class="sp-bullets">${p.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+    </div>
+    <div class="timer-disp" id="spTimer">${Math.floor(p.secs/60)}:${(p.secs%60).toString().padStart(2,'0')}</div>
+    <div style="display:flex;gap:7px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;">
+      <button class="nav-btn" style="background:var(--green);" onclick="spStart()" id="spStartBtn">▶ Start Timer</button>
+      <button class="nav-btn" style="background:var(--grey);" onclick="spReset()">↺ Reset</button>
+    </div>
+    <div style="background:#f0f7ff;border-radius:6px;padding:10px 13px;border-left:3px solid var(--blue);margin-bottom:8px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">📋 ${p.label} Guide</div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.7;">${p.guide}</div>
+    </div>
+    <div style="background:#fffbdb;border-radius:6px;padding:10px 13px;border-left:3px solid var(--orange);">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">🎯 BC Speaking Criteria</div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.8;">📌 Fluency & Coherence<br>📌 Lexical Resource<br>📌 Grammatical Range & Accuracy<br>📌 Pronunciation</div>
+    </div>
+  `;
+  document.getElementById('rightPanel').innerHTML=`
+    <div class="instructions"><strong>${p.label}</strong> — Speak aloud using the timer. Type your answer for AI feedback.</div>
+    <div style="background:#f5f5f5;border-radius:6px;padding:9px 12px;margin-bottom:9px;border-left:3px solid var(--grey);">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--grey);margin-bottom:4px;">Useful Phrases</div>
+      <div style="font-size:12.5px;color:var(--dark);line-height:2;">${p.phrases}</div>
+    </div>
+    <div style="margin-bottom:9px;"><div style="font-size:12px;font-weight:600;margin-bottom:5px;">Fluency Tips</div>
+    <ul style="list-style:none;">${p.tips.map(t=>`<li style="padding:4px 0;border-bottom:1px solid var(--border);font-size:12.5px;display:flex;gap:5px;"><span style="color:var(--orange);flex-shrink:0;">✦</span>${t}</li>`).join('')}</ul></div>
+    <textarea id="spText" style="min-height:140px;" placeholder="Type your spoken answer here for AI feedback..." oninput="updateSpWC()"></textarea>
+    <div class="wc" id="spWC">Words: 0</div>
+    <button class="nav-btn" style="background:var(--blue);" onclick="getSPFB()" id="spBtn">🤖 Get AI Speaking Feedback</button>
+    <div class="fb-box" id="spFb"></div>
+  `;
+}
+function setSpPart(i){curSpPart=i;clearInterval(spInterval);spRunning=false;renderSpeaking();}
+function updateSpWC(){const t=document.getElementById('spText');if(!t)return;const c=t.value.trim()?t.value.trim().split(/\s+/).length:0;document.getElementById('spWC').textContent='Words: '+c;}
+function spStart(){if(spRunning)return;spRunning=true;document.getElementById('spStartBtn').textContent='⏸ Running...';spInterval=setInterval(()=>{spSecs--;const m=Math.floor(spSecs/60),s=spSecs%60;const el=document.getElementById('spTimer');if(el){el.textContent=`${m}:${s.toString().padStart(2,'0')}`;el.classList.remove('run','warn');if(spSecs<=30)el.classList.add('warn');else el.classList.add('run');}if(spSecs<=0){clearInterval(spInterval);spRunning=false;if(el){el.textContent='Done! ✓';el.classList.remove('run','warn');}const b=document.getElementById('spStartBtn');if(b)b.textContent='▶ Start Timer';}},1000);}
+function spReset(){clearInterval(spInterval);spRunning=false;spSecs=SPD[curSpPart].secs;const el=document.getElementById('spTimer');if(el){el.textContent=`${Math.floor(spSecs/60)}:${(spSecs%60).toString().padStart(2,'0')}`;el.classList.remove('run','warn');}const b=document.getElementById('spStartBtn');if(b)b.textContent='▶ Start Timer';}
+async function getSPFB(){
+  const text=document.getElementById('spText').value.trim();
+  if(!text||text.split(/\s+/).length<8){alert('Please type at least 8 words.');return;}
+  const p=SPD[curSpPart];
+  const btn=document.getElementById('spBtn');btn.innerHTML='<span class="spin"></span>Analysing...';btn.disabled=true;
+  const fb=document.getElementById('spFb');fb.className='fb-box on';fb.innerHTML='<div style="padding:8px;color:var(--grey);font-size:13px;"><span class="spin"></span>Scoring with BC criteria...</div>';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`You are an IELTS Speaking examiner (British Council trained). Evaluate this ${p.label} response.
+Topic: "${p.topic}"
+Response: "${text}"
+Reply EXACTLY:
+OVERALL_BAND: [number]
+FLUENCY_COHERENCE: [band] | [2 sentences]
+LEXICAL_RESOURCE: [band] | [2 sentences]
+GRAMMATICAL_RANGE: [band] | [2 sentences with errors]
+PRONUNCIATION: [band] | [1 sentence]
+MISTAKES:
+- [exact weak phrase] → [correction]
+- [another phrase] → [correction]
+- [third] → [correction]
+IMPROVEMENTS:
+- [tip 1]
+- [tip 2]
+- [tip 3]
+IMPROVED_SENTENCE: [rewrite weakest sentence at Band 7+]`}]})});
+    const d=await r.json();fb.innerHTML=parseFB(d.content[0].text);
+  }catch{fb.innerHTML='<div style="padding:9px;background:#fee2e2;border-radius:6px;color:#8b1010;">Feedback unavailable.</div>';}
+  btn.innerHTML='🤖 Get AI Speaking Feedback';btn.disabled=false;
+}
+
+// ══════════════════════════
+// VOCABULARY
+// ══════════════════════════
+const VOCAB={
+  academic:[
+    {w:'Ambiguous',t:'adj',def:'Having more than one possible meaning; unclear.',bn:'দ্ব্যর্থবোধক',gram:'Often used before a noun: "an ambiguous statement". Antonym: unambiguous.',ex1:'"The exam instructions were ambiguous, confusing many students."',ex2:'"His response was deliberately ambiguous."',ielts:true},
+    {w:'Substantial',t:'adj',def:'Of considerable size, value, or importance.',bn:'উল্লেখযোগ্য',gram:'Adjective before a noun or after a linking verb. Adverb form: substantially.',ex1:'"There was a substantial increase in online learning after 2020."',ex2:'"The evidence is substantial."',ielts:true},
+    {w:'Inevitable',t:'adj',def:'Certain to happen; impossible to avoid.',bn:'অপরিহার্য',gram:'Often: "it is inevitable that..." or "inevitable + noun". Adverb: inevitably.',ex1:'"Technological change is inevitable in modern society."',ex2:'"Conflict seemed inevitable."',ielts:true},
+    {w:'Controversial',t:'adj',def:'Causing a lot of disagreement or debate.',bn:'বিতর্কিত',gram:'Controversial + noun OR noun + is/was controversial. Often collocates with "highly".',ex1:'"The new education policy was highly controversial."',ex2:'"This is a controversial topic."',ielts:true},
+    {w:'Phenomenon',t:'noun',def:'An observable fact or event, especially one whose cause is in question.',bn:'ঘটনা / প্রপঞ্চ',gram:'Singular: phenomenon. Plural: phenomena (NOT "phenomenons" in academic writing).',ex1:'"Social media addiction is a global phenomenon."',ex2:'"Scientists studied the phenomenon of mass migration."',ielts:true},
+    {w:'Fluctuate',t:'verb',def:'To rise and fall irregularly; to change frequently.',bn:'ওঠানামা করা',gram:'Intransitive verb (no object). Common pattern: "fluctuate between X and Y". Noun: fluctuation.',ex1:'"Temperatures fluctuate significantly between seasons."',ex2:'"Prices have been fluctuating all year."',ielts:true},
+    {w:'Deteriorate',t:'verb',def:'To become progressively worse.',bn:'অবনতি হওয়া',gram:'Intransitive verb. Noun form: deterioration. Often + rapidly, significantly.',ex1:'"Air quality in the city began to deteriorate rapidly."',ex2:'"Relations between the two countries had deteriorated."',ielts:true},
+    {w:'Consecutive',t:'adj',def:'Following in an unbroken sequence; successive.',bn:'ক্রমাগত',gram:'Always placed BEFORE a noun. "Consecutive + plural noun". E.g., "three consecutive years".',ex1:'"She won the tournament for five consecutive years."',ex2:'"There were consecutive power cuts all week."',ielts:true},
+  ],
+  environment:[
+    {w:'Biodiversity',t:'noun',def:'The variety of plant and animal life in a particular habitat.',bn:'জীববৈচিত্র্য',gram:'Uncountable noun. Collocates: rich/high/low biodiversity, protect/threaten biodiversity.',ex1:'"Tropical rainforests contain extraordinary biodiversity."',ex2:'"The project aims to protect local biodiversity."',ielts:true},
+    {w:'Sustainable',t:'adj',def:'Capable of being maintained without depleting natural resources.',bn:'টেকসই',gram:'Sustainable + noun. Often: sustainable development, sustainable energy, sustainable farming.',ex1:'"Sustainable farming practices protect the soil for future generations."',ex2:'"The company is committed to sustainable energy."',ielts:true},
+    {w:'Eradicate',t:'verb',def:'To completely destroy or eliminate something.',bn:'নির্মূল করা',gram:'Transitive verb. Eradicate + disease/poverty/species. Noun: eradication.',ex1:'"Scientists hope to eradicate malaria within a decade."',ex2:'"The predators were eradicated from the island."',ielts:true},
+    {w:'Emissions',t:'noun',def:'Gases or other substances discharged into the air.',bn:'নির্গমন / নির্গত গ্যাস',gram:'Usually plural: carbon emissions, greenhouse gas emissions. Verb: emit.',ex1:'"The government pledged to reduce carbon emissions by 50%."',ex2:'"Vehicle emissions are a major source of air pollution."',ielts:true},
+    {w:'Contamination',t:'noun',def:'The process of making something impure or harmful.',bn:'দূষণ / দূষিত করা',gram:'Uncountable noun. Collocates: water/soil/air contamination. Verb: contaminate.',ex1:'"Water contamination is a serious public health risk in many regions."',ex2:'"Chemical contamination of the river killed thousands of fish."',ielts:true},
+  ],
+  technology:[
+    {w:'Algorithm',t:'noun',def:'A set of rules or steps for solving a problem or completing a task.',bn:'অ্যালগরিদম',gram:'Countable noun. An algorithm. Algorithms recommend/determine/calculate.',ex1:'"The recommendation algorithm analyses your viewing history."',ex2:'"Algorithms are now used to make complex medical decisions."',ielts:true},
+    {w:'Automation',t:'noun',def:'The use of technology to perform tasks without human intervention.',bn:'স্বয়ংক্রিয়তা',gram:'Uncountable noun. Collocates: industrial automation, full/partial automation. Verb: automate.',ex1:'"Automation is rapidly replacing manual jobs in manufacturing."',ex2:'"The automation of checkout systems has reduced staff numbers."',ielts:true},
+    {w:'Obsolete',t:'adj',def:'No longer in use; out of date.',bn:'অপ্রচলিত / পুরনো',gram:'Become/render/make obsolete. Synonym: outdated, redundant.',ex1:'"Fax machines have become entirely obsolete."',ex2:'"New technology rendered the old system obsolete within months."',ielts:true},
+    {w:'Surveillance',t:'noun',def:'Close observation of a person, place, or process.',bn:'নজরদারি',gram:'Uncountable noun. Mass/constant/government surveillance. Under surveillance.',ex1:'"CCTV enables constant surveillance of public spaces."',ex2:'"Critics argue that government surveillance threatens privacy."',ielts:true},
+  ],
+  society:[
+    {w:'Inequality',t:'noun',def:'The state of being unequal in status, rights, or opportunities.',bn:'বৈষম্য',gram:'Uncountable noun (or countable for specific types). Social/economic/gender inequality.',ex1:'"Economic inequality has grown significantly in many countries."',ex2:'"The report highlighted inequalities in access to healthcare."',ielts:true},
+    {w:'Segregation',t:'noun',def:'The enforced separation of different groups of people.',bn:'পৃথকীকরণ',gram:'Uncountable noun. Racial/social/residential segregation. Verb: segregate.',ex1:'"Racial segregation was abolished in the United States in the 1960s."',ex2:'"The policy reinforced residential segregation in the city."',ielts:true},
+    {w:'Demographic',t:'noun/adj',def:'Relating to the structure of populations, especially by age, gender, and income.',bn:'জনসংখ্যা-বিষয়ক',gram:'As adjective: demographic change/data/profile. As noun (usually plural): the demographics.',ex1:'"The demographic profile of the city has changed dramatically."',ex2:'"The product targets a younger demographic."',ielts:true},
+    {w:'Disparity',t:'noun',def:'A great difference or inequality between things.',bn:'বৈষম্য / পার্থক্য',gram:'Countable noun. A disparity in/between something. Plural: disparities.',ex1:'"There is a significant disparity in income between urban and rural areas."',ex2:'"Racial disparities in education outcomes remain a major challenge."',ielts:true},
+  ],
+  health:[
+    {w:'Pandemic',t:'noun',def:'A disease outbreak that spreads across a very wide area and affects a large proportion of the population.',bn:'মহামারী',gram:'A pandemic (countable). Compare: epidemic (more local). During/throughout the pandemic.',ex1:'"The COVID-19 pandemic disrupted economies around the world."',ex2:'"Governments struggled to respond to the pandemic."',ielts:true},
+    {w:'Deterioration',t:'noun',def:'A gradual decline in quality, condition, or strength.',bn:'অবনতি',gram:'Uncountable noun. Deterioration of/in something. Verb: deteriorate.',ex1:'"The deterioration of the patient\'s condition alarmed doctors."',ex2:'"Climate change is accelerating the deterioration of Arctic ecosystems."',ielts:true},
+    {w:'Diagnose',t:'verb',def:'To identify an illness or problem by examining symptoms or evidence.',bn:'রোগ নির্ণয় করা',gram:'Diagnose + patient WITH + illness. Passive: be diagnosed with. Noun: diagnosis, diagnoses (plural).',ex1:'"She was diagnosed with diabetes at the age of 35."',ex2:'"AI systems can now diagnose certain cancers with high accuracy."',ielts:true},
+    {w:'Susceptible',t:'adj',def:'Easily affected, harmed, or influenced by something.',bn:'সংবেদনশীল / ঝুঁকিতে',gram:'Susceptible TO something (NOT "of"). Collocates: susceptible to disease/infection/influence.',ex1:'"Young children are particularly susceptible to respiratory infections."',ex2:'"The population is susceptible to propaganda when anxious."',ielts:true},
+  ],
+  everyday:[
+    {w:'Consequently',t:'adverb',def:'As a result; therefore.',bn:'ফলস্বরূপ',gram:'Sentence adverb — often at the start: "Consequently, ..." or after a semicolon. Formal register.',ex1:'"He failed to prepare; consequently, he failed the exam."',ex2:'"The company lost its main client. Consequently, profits fell sharply."',ielts:false},
+    {w:'Nevertheless',t:'adverb',def:'In spite of that; however; despite what has just been said.',bn:'তবুও / তথাপি',gram:'Conjunction/adverb. Stronger than "however". Used to introduce a contrast. More formal than "but".',ex1:'"The task was difficult; nevertheless, she completed it on time."',ex2:'"The evidence is weak. Nevertheless, it is worth investigating."',ielts:false},
+    {w:'Adequate',t:'adj',def:'Satisfactory or acceptable in quality or quantity.',bn:'পর্যাপ্ত',gram:'Adequate + noun, or be adequate for + noun/gerund. Adverb: adequately. Antonym: inadequate.',ex1:'"The funding was not adequate to cover all project costs."',ex2:'"Students need adequate time to prepare for exams."',ielts:false},
+    {w:'Approximately',t:'adverb',def:'Used to show that something is almost, but not exactly, correct.',bn:'প্রায়',gram:'Modifies numbers, amounts, times. Synonyms: about, around, roughly (less formal).',ex1:'"The journey takes approximately three hours."',ex2:'"Approximately 40% of respondents disagreed with the policy."',ielts:false},
+    {w:'Consequently',t:'adverb',def:'As a result; therefore.',bn:'ফলস্বরূপ',gram:'Formal linking adverb used to show result/effect.',ex1:'"He missed the deadline; consequently, the project was delayed."',ex2:'"The roads were icy. Consequently, many accidents occurred."',ielts:false},
+  ],
+};
+
+let curVCat='ai',curVMode='browse',curVWords=[],curQuizIdx=0,curQuizScore=0,quizAnswered=false;
+
+function setVCat(cat,el){
+  curVCat=cat;
+  document.querySelectorAll('.vcat-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  const modeBar=document.getElementById('vocabModeBar');
+  if(cat==='ai'){
+    document.getElementById('vcatTitle').textContent='AI Word Search';
+    modeBar.style.display='none';
+    document.getElementById('vocabArea').innerHTML=`
+      <div style="max-width:540px;margin:0 auto;">
+        <div style="text-align:center;padding:16px 0 12px;"><div style="font-size:2.2rem;margin-bottom:7px;">🤖</div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px;">AI Word Explanation</div>
+        <div style="font-size:12.5px;color:var(--grey);margin-bottom:16px;">Type any English word — IELTS or everyday — and get a full explanation with grammar notes and examples.</div></div>
+        <div style="display:flex;gap:8px;"><input class="ainput" id="aiWordInput" placeholder="Type any word..." onkeydown="if(event.key==='Enter')doAIWordSearch()" style="margin-bottom:0;"/><button class="abtn" onclick="doAIWordSearch()" style="width:auto;padding:9px 16px;margin-bottom:0;">Search</button></div>
+        <div id="aiWordResult" style="margin-top:14px;"></div>
+      </div>`;
+  }else{
+    curVWords=VOCAB[cat]||[];
+    const catNames={academic:'🎓 IELTS Academic',environment:'🌿 Environment',technology:'💻 Technology',society:'🏙️ Society',health:'❤️ Health',everyday:'💬 Everyday English'};
+    document.getElementById('vcatTitle').textContent=catNames[cat]||cat;
+    modeBar.style.display='flex';
+    setVMode(curVMode,document.querySelector('.vocab-mode-btn.active')||document.querySelector('.vocab-mode-btn'));
+  }
+}
+
+function setVMode(mode,btn){
+  curVMode=mode;
+  document.querySelectorAll('.vocab-mode-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(mode==='browse')renderVBrowse();
+  else if(mode==='flashcard')renderVFlashcard();
+  else if(mode==='quiz')renderVQuiz();
+}
+
+function renderVBrowse(){
+  const area=document.getElementById('vocabArea');
+  area.innerHTML=`<div class="word-cards-grid">${curVWords.map((w,i)=>`
+    <div class="wcard" id="wc${i}" onclick="this.classList.toggle('flipped')">
+      <div class="wcard-type">${w.t}${w.ielts?'<span class="ielts-badge">IELTS</span>':''}</div>
+      <div class="wcard-word">${w.w}</div>
+      <div class="wcard-bn">🇧🇩 ${w.bn}</div>
+      <div class="wcard-hidden">
+        <div class="wcard-def">${w.def}</div>
+        <div class="wcard-gram">📖 ${w.gram}</div>
+        <div class="wcard-ex">✦ ${w.ex1}</div>
+        ${w.ex2?`<div class="wcard-ex">✦ ${w.ex2}</div>`:''}
+      </div>
+      <div class="wcard-hint">tap ▸</div>
+    </div>`).join('')}</div>`;
+}
+
+let flashIdx=0;
+function renderVFlashcard(){
+  flashIdx=0;showFlashcard();
+}
+function showFlashcard(){
+  const area=document.getElementById('vocabArea');
+  if(!curVWords.length){area.innerHTML='<div style="text-align:center;padding:20px;color:var(--grey);">No words in this category.</div>';return;}
+  const w=curVWords[flashIdx];let flipped=false;
+  area.innerHTML=`
+    <div style="max-width:500px;margin:0 auto;">
+      <div style="font-size:12px;color:var(--grey);text-align:center;margin-bottom:10px;">${flashIdx+1} / ${curVWords.length}</div>
+      <div style="height:5px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;">
+        <div style="height:100%;width:${(flashIdx+1)/curVWords.length*100}%;background:linear-gradient(90deg,var(--orange),var(--green));border-radius:10px;"></div>
+      </div>
+      <div id="flashCard" style="background:var(--dark);border-radius:12px;padding:28px 24px;text-align:center;cursor:pointer;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;" onclick="flipFlash()">
+        <div style="font-size:9.5px;color:#f5d87a;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px;">${w.t}${w.ielts?' — IELTS':''}</div>
+        <div style="font-size:28px;font-weight:700;color:#f5d87a;margin-bottom:6px;">${w.w}</div>
+        <div style="font-size:13px;color:#86efac;">🇧🇩 ${w.bn}</div>
+        <div id="flashHidden" style="display:none;margin-top:16px;width:100%;">
+          <div style="font-size:14px;color:#e2e8f0;margin-bottom:9px;">${w.def}</div>
+          <div style="font-size:12.5px;color:#60a5fa;margin-bottom:6px;font-style:italic;">📖 ${w.gram}</div>
+          <div style="font-size:12.5px;color:#94a3b8;font-style:italic;">✦ ${w.ex1}</div>
+        </div>
+        <div style="font-size:11px;color:#475569;margin-top:10px;" id="flashHint">Click to reveal →</div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
+        <button class="nav-btn" onclick="prevFlash()" ${flashIdx===0?'disabled style="opacity:.4;"':''}>← Prev</button>
+        <button class="nav-btn" onclick="nextFlash()" ${flashIdx===curVWords.length-1?'disabled style="opacity:.4;"':''}>Next →</button>
+      </div>
+    </div>`;
+}
+function flipFlash(){const h=document.getElementById('flashHidden');const hint=document.getElementById('flashHint');if(h){h.style.display=h.style.display==='none'?'block':'none';if(hint)hint.style.display='none';}}
+function nextFlash(){if(flashIdx<curVWords.length-1){flashIdx++;showFlashcard();}}
+function prevFlash(){if(flashIdx>0){flashIdx--;showFlashcard();}}
+
+function renderVQuiz(){
+  curQuizIdx=0;curQuizScore=0;showQuizQ();
+}
+function showQuizQ(){
+  const area=document.getElementById('vocabArea');
+  if(!curVWords.length){area.innerHTML='<div style="text-align:center;padding:20px;color:var(--grey);">No words to quiz.</div>';return;}
+  if(curQuizIdx>=curVWords.length){
+    const pct=Math.round(curQuizScore/curVWords.length*100);
+    area.innerHTML=`<div class="quiz-card" style="text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:8px;">🎉</div>
+      <div style="font-size:28px;font-weight:700;color:var(--dark);margin-bottom:4px;">${curQuizScore}/${curVWords.length}</div>
+      <div style="font-size:13px;color:var(--grey);margin-bottom:14px;">${pct}% correct</div>
+      <button class="abtn" onclick="renderVQuiz()" style="width:auto;padding:8px 20px;">Try Again</button>
+    </div>`;return;
+  }
+  const w=curVWords[curQuizIdx];quizAnswered=false;
+  // Build 4 options
+  const others=curVWords.filter((_,i)=>i!==curQuizIdx).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[w,...others].sort(()=>Math.random()-.5);
+  area.innerHTML=`<div class="quiz-card">
+    <div class="quiz-prog">${curQuizIdx+1} of ${curVWords.length} — Score: ${curQuizScore}</div>
+    <div class="quiz-prog-bar"><div class="quiz-prog-fill" style="width:${(curQuizIdx/curVWords.length)*100}%"></div></div>
+    <div class="quiz-q">Which word matches this definition?<br><br><em>"${w.def}"</em><br><br><span style="font-size:12px;color:var(--grey);">🇧🇩 ${w.bn}</span></div>
+    <div class="quiz-opts">${opts.map((o,i)=>`<button class="quiz-opt" onclick="checkVQuizOpt('${o.w}','${w.w}',this)">${String.fromCharCode(65+i)}. ${o.w}</button>`).join('')}</div>
+    <div class="quiz-feedback" id="qFb"></div>
+    <button id="qNext" class="abtn" onclick="showQuizQ()" style="display:none;width:auto;padding:7px 18px;">Next →</button>
+  </div>`;
+}
+function checkVQuizOpt(chosen,correct,el){
+  if(quizAnswered)return;quizAnswered=true;
+  document.querySelectorAll('.quiz-opt').forEach(b=>b.style.pointerEvents='none');
+  const fb=document.getElementById('qFb');
+  const cw=curVWords.find(w=>w.w===correct);
+  if(chosen===correct){
+    curQuizScore++;el.classList.add('correct');fb.textContent='✅ Correct! '+cw.def;fb.className='quiz-feedback ok';
+  }else{
+    el.classList.add('incorrect');
+    document.querySelectorAll('.quiz-opt').forEach(b=>{if(b.textContent.includes(correct))b.classList.add('correct');});
+    fb.textContent='❌ Not quite. The answer is "'+correct+'" — '+cw.def;fb.className='quiz-feedback no';
+  }
+  const next=document.getElementById('qNext');if(next)next.style.display='inline-block';
+  curQuizIdx++;
+}
+
+function handleVocabSearch(v){if(!v.trim())return;}
+async function doAIWordSearch(){
+  const inp=document.getElementById('aiWordInput');if(!inp)return;
+  const word=inp.value.trim();if(!word){alert('Please type a word first.');return;}
+  const area=document.getElementById('aiWordResult');
+  area.innerHTML='<div style="text-align:center;padding:16px;color:var(--grey);font-size:13px;"><span class="spin"></span> Getting AI explanation for "'+word+'"...</div>';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:`Explain the English word "${word}" comprehensively for an IELTS student. Reply ONLY in this format:
+
+WORD: [the word]
+TYPE: [part of speech]
+DEFINITION: [clear 1-2 sentence definition]
+BENGALI: [Bengali meaning/translation]
+GRAMMAR: [2-3 sentences: grammar patterns, common collocations, verb forms, countable/uncountable if noun, etc.]
+IELTS: [YES or NO — is this word commonly tested in IELTS?]
+EXAMPLE1: [strong example sentence]
+EXAMPLE2: [another example in a different context]
+SYNONYMS: [2-3 synonyms with brief notes on differences]`}]})});
+    const d=await r.json();
+    const text=d.content[0].text;
+    const res={};text.split('\n').forEach(l=>{const s=l.trim();const idx=s.indexOf(':');if(idx>0){const k=s.slice(0,idx).trim();const v=s.slice(idx+1).trim();res[k]=v;}});
+    area.innerHTML=`<div class="ai-word-result">
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+        <div class="ai-result-word">${res.WORD||word}</div>
+        ${res.IELTS==='YES'?'<span class="ielts-badge" style="font-size:11px;padding:2px 9px;">IELTS</span>':''}
+      </div>
+      <div class="ai-result-type">${res.TYPE||'word'}</div>
+      ${res.DEFINITION?`<div class="ai-result-section"><div class="ai-result-section-title">📖 Definition</div><div>${res.DEFINITION}</div><div style="font-size:12px;color:#0a5a2c;margin-top:4px;font-weight:600;">🇧🇩 ${res.BENGALI||'—'}</div></div>`:''}
+      ${res.GRAMMAR?`<div class="ai-result-section grammar"><div class="ai-result-section-title">⚙️ Grammar & Usage</div><div style="font-size:13px;line-height:1.7;">${res.GRAMMAR}</div></div>`:''}
+      ${(res.EXAMPLE1||res.EXAMPLE2)?`<div class="ai-result-section example"><div class="ai-result-section-title">✦ Example Sentences</div>${res.EXAMPLE1?`<div style="font-size:13px;font-style:italic;margin-bottom:4px;">${res.EXAMPLE1}</div>`:''}${res.EXAMPLE2?`<div style="font-size:13px;font-style:italic;">${res.EXAMPLE2}</div>`:''}</div>`:''}
+      ${res.SYNONYMS?`<div class="ai-result-section"><div class="ai-result-section-title">≈ Synonyms</div><div style="font-size:13px;">${res.SYNONYMS}</div></div>`:''}
+    </div>`;
+  }catch{area.innerHTML='<div style="padding:10px;background:#fee2e2;border-radius:6px;color:#8b1010;">Could not get explanation. Check connection.</div>';}
+}
+
+// ══════════════════════════
+// SHARED HELPERS
+// ══════════════════════════
+function saveAns(n,v){if(v.trim())userAnswers[n]=v.trim();else delete userAnswers[n];updateSecStatus();updateQGrid();}
+function selTFNG(n,o,el){userAnswers[n]=o;el.parentElement.querySelectorAll('.opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');updateQGrid();}
+function selMCQ(n,l,el){userAnswers[n]=l;el.parentElement.querySelectorAll('.mcq-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');updateSecStatus();updateQGrid();}
+function updateQGrid(){
+  const grid=document.getElementById('qNumGrid');if(!grid)return;
+  if(curMod==='writing'||curMod==='speaking'){grid.innerHTML='';return;}
+  let qs=[];
+  if(curMod==='listening')qs=LD.sections[curSec-1].qs;
+  else if(curMod==='reading')qs=RD[curPassIdx].qs;
+  grid.innerHTML=qs.map(q=>`<button class="qnum ${userAnswers[q.n]?'answered':''}" onclick="jumpQ(${q.n})">${q.n}</button>`).join('');
+}
+function jumpQ(n){const el=document.getElementById('q'+n);if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});}}
+function nextOrSubmit(){
+  if(curMod==='listening'&&curSec<4)renderListening(curSec+1);
+  else if(curMod==='reading'&&curPassIdx<RD.length-1)switchPassage(curPassIdx+1);
+  else submitTest();
+}
+
+// ══════════════════════════
+// EXPLANATION MODAL
+// ══════════════════════════
+function showExpl(qNum,mod){
+  if((mod==='L'&&!submittedMods.listening)||(mod==='R'&&!submittedMods.reading)){
+    alert('🔒 Locked. Please submit the test first to see explanations.');return;
+  }
+  let q=null;
+  if(mod==='L'){for(const s of LD.sections){const f=s.qs.find(x=>x.n===qNum);if(f){q=f;break;}}}
+  else{for(const p of RD){const f=p.qs.find(x=>x.n===qNum);if(f){q=f;break;}}}
+  if(!q)return;
+  document.getElementById('explTitle').textContent=`Q${qNum} — Full Explanation`;
+  document.getElementById('explBody').innerHTML=`
+    <div><span class="expl-pill">${q.ans}</span> <strong>Correct Answer</strong></div>
+    <div class="expl-lbl">Why is this correct?</div>
+    <div style="font-size:13.5px;">${q.why||'Listen/read carefully for the answer.'}</div>
+    ${q.quote?`<div class="expl-lbl">Evidence from ${mod==='L'?'transcript':'passage'}</div><div class="expl-quote">${q.quote}</div>`:''}
+    ${q.tip?`<div class="expl-lbl">💡 IELTS Tip</div><div style="font-size:13px;">${q.tip}</div>`:''}
+  `;
+  document.getElementById('explModal').classList.add('on');
+}
+
+// ══════════════════════════
+// SUBMIT + REVEAL ANSWERS
+// ══════════════════════════
+function revealAnswers(mod){
+  const allQs=mod==='L'?LD.sections.flatMap(s=>s.qs):RD.flatMap(p=>p.qs);
+  allQs.forEach(q=>{
+    const el=document.getElementById('ar'+q.n);if(!el)return;
+    const user=(userAnswers[q.n]||'').toLowerCase().trim();
+    const ok=user===q.ans.toLowerCase()||(q.alt||[]).map(a=>a.toLowerCase()).includes(user);
+    el.className='q-ar show'+(ok?'':' wrong');
+    el.innerHTML=`<div class="${ok?'ar-ans':'ar-ans w'}">${ok?'✅ Correct':'❌ Incorrect'} — Correct: ${q.ans}</div>
+      ${userAnswers[q.n]?`<div style="font-size:11.5px;color:var(--grey);">Your answer: <em>${userAnswers[q.n]}</em></div>`:''}
+      ${q.why?`<div class="ar-why">${q.why}</div>`:''}
+      ${q.quote?`<div class="ar-quote">${q.quote}</div>`:''}`;
+    if(q.t==='mcq'){document.querySelectorAll('.mcq-opt').forEach(b=>{const l=b.querySelector('.mcl')?.textContent?.trim();if(l===q.ans)b.classList.add('ok');else if(l===userAnswers[q.n]&&!ok)b.classList.add('wrong');b.style.pointerEvents='none';});}
+    if(q.t==='tfng'){document.querySelectorAll('.opt').forEach(b=>{if(b.textContent.trim()===q.ans)b.classList.add('ok');else if(b.textContent.trim()===userAnswers[q.n]&&!ok)b.classList.add('wrong');b.style.pointerEvents='none';});}
+    if(q.t==='gap'){const inp=document.getElementById('q'+q.n);if(inp){inp.classList.add(ok?'ok':'wrong');inp.readOnly=true;}}
+  });
+}
+
+function submitTest(){
+  if(curMod==='writing'||curMod==='speaking'){alert('Use the "🤖 Get AI Feedback" button for Writing/Speaking.');return;}
+  if(!confirm('Submit and see results?'))return;
+  stopTimers();submittedMods[curMod]=true;
+  const allQs=curMod==='listening'?LD.sections.flatMap(s=>s.qs):RD.flatMap(p=>p.qs);
+  let correct=0,qHtml='';
+  allQs.forEach(q=>{
+    const user=(userAnswers[q.n]||'').toLowerCase().trim();
+    const ok=user===q.ans.toLowerCase()||(q.alt||[]).map(a=>a.toLowerCase()).includes(user);
+    if(ok)correct++;
+    qHtml+=`<div class="rb-row ${ok?'correct':'wrong'}"><span>${ok?'✅':'❌'}</span><span style="font-weight:700;min-width:30px;">Q${q.n}</span><span style="color:var(--grey);flex:1;">Your: <em>${userAnswers[q.n]||'—'}</em></span><span style="color:${ok?'var(--green)':'var(--red)'};font-weight:600;">→ ${q.ans}</span></div>`;
+  });
+  const total=allQs.length;const pct=Math.round(correct/total*100);
+  let band;
+  if(curMod==='listening')band=correct>=39?9:correct>=37?8.5:correct>=35?8:correct>=32?7.5:correct>=30?7:correct>=26?6.5:correct>=23?6:correct>=18?5.5:correct>=16?5:4.5;
+  else band=correct>=26?9:correct>=23?8.5:correct>=20?8:correct>=17?7.5:correct>=14?7:correct>=11?6.5:correct>=8?6:correct>=5?5.5:5;
+  document.getElementById('rbTitle').textContent=`${curMod.charAt(0).toUpperCase()+curMod.slice(1)} — Results`;
+  document.getElementById('rbScore').textContent=`${correct}/${total}`;
+  document.getElementById('rbBand').textContent=`Band ${band}`;
+  document.getElementById('rbBody').innerHTML=`<div style="font-size:13px;color:var(--grey);margin-bottom:9px;">You scored <strong>${correct}/${total}</strong> (${pct}%). Close to review answers under each question.</div>${qHtml}`;
+  document.getElementById('resultsModal').classList.add('on');
+  // Auto-show answers
+  const arb=document.getElementById('ansRevBtn')||document.getElementById('rAnsBtn');
+  if(arb&&!arb.classList.contains('on'))arb.click();
+  revealAnswers(curMod==='listening'?'L':'R');
+}
+function closeResults(){document.getElementById('resultsModal').classList.remove('on');revealAnswers(curMod==='listening'?'L':'R');}
+
+// ══════════════════════════
+// COMMUNITY
+// ══════════════════════════
+let postImg=null,postFileData=null,postFileName='';
+function getPosts(){return JSON.parse(localStorage.getItem('if_posts')||'[]');}
+function savePosts(p){localStorage.setItem('if_posts',JSON.stringify(p));}
+function previewImg(input){if(!input.files||!input.files[0])return;const r=new FileReader();r.onload=e=>{postImg=e.target.result;document.getElementById('attachInfo').textContent='📷 Image ready';};r.readAsDataURL(input.files[0]);}
+function previewFile(input){if(!input.files||!input.files[0])return;postFileName=input.files[0].name;const r=new FileReader();r.onload=e=>{postFileData=e.target.result;document.getElementById('attachInfo').textContent='📎 '+postFileName;};r.readAsDataURL(input.files[0]);}
+
+function submitPost(){
+  const text=document.getElementById('composerText').value.trim();
+  if(!text&&!postImg&&!postFileData){alert('Write something or attach a file.');return;}
+  const posts=getPosts();
+  posts.unshift({id:Date.now(),author:currentUser?.name||'Guest',email:currentUser?.email||'',avatar:currentUser?.avatar||'',text,image:postImg,file:postFileData,fileName:postFileName,timestamp:Date.now(),replies:[],likes:[]});
+  savePosts(posts);
+  document.getElementById('composerText').value='';
+  postImg=null;postFileData=null;postFileName='';
+  document.getElementById('attachInfo').textContent='';
+  document.getElementById('postImg').value='';
+  document.getElementById('postFile').value='';
+  renderPosts();
+}
+
+function getAvatarHTML(av,name,size=38){
+  const s=`width:${size}px;height:${size}px;border-radius:50%;`;
+  if(av)return`<div class="post-av" style="${s}overflow:hidden;"><img src="${av}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/></div>`;
+  return`<div class="post-av" style="${s}background:var(--forge);color:#fff;font-size:${Math.round(size*0.37)}px;font-weight:700;display:flex;align-items:center;justify-content:center;">${(name||'G').charAt(0).toUpperCase()}</div>`;
+}
+
+function renderPosts(){
+  const posts=getPosts();const feed=document.getElementById('postFeed');if(!feed)return;
+  if(!posts.length){feed.innerHTML='<div style="text-align:center;color:var(--grey);font-size:13px;padding:22px;">No posts yet. Be the first to share!</div>';return;}
+  feed.innerHTML=posts.map(p=>`
+    <div class="post-card">
+      <div class="post-header">
+        ${getAvatarHTML(p.avatar,p.author)}
+        <div><div class="post-author">${p.author}</div><div class="post-time">${timeAgo(p.timestamp)}</div></div>
+      </div>
+      ${p.text?`<div class="post-text">${p.text}</div>`:''}
+      ${p.image?`<img class="post-img" src="${p.image}" alt="post"/>`:''}
+      ${p.file?`<a class="post-file-link" href="${p.file}" download="${p.fileName}">📎 ${p.fileName}</a>`:''}
+      <div class="post-actions">
+        <button class="post-action ${(p.likes||[]).includes(currentUser?.email)?'liked':''}" onclick="toggleLike(${p.id})">❤️ ${(p.likes||[]).length}</button>
+        <button class="post-action" onclick="toggleReplies(${p.id})">💬 ${p.replies.length} ${p.replies.length===1?'Reply':'Replies'}</button>
+      </div>
+      <div class="replies" id="rep${p.id}">
+        ${p.replies.map(r=>`<div class="reply-row">${getAvatarHTML(r.avatar,r.author,26)}<div class="reply-bubble"><div class="reply-author">${r.author}</div>${r.text}</div></div>`).join('')}
+        <div class="ri-row">
+          <input class="ri" id="ri${p.id}" placeholder="Write a reply..." onkeydown="if(event.key==='Enter')submitReply(${p.id})"/>
+          <button class="ri-submit" onclick="submitReply(${p.id})">Reply</button>
+        </div>
+      </div>
+    </div>`).join('');
+  // Update composer avatar with profile pic
+  const ca=document.getElementById('composerAv');
+  if(ca&&currentUser){
+    if(currentUser.avatar){ca.innerHTML=`<img src="${currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;}
+    else{ca.textContent=currentUser.name.charAt(0).toUpperCase();}
+  }
+}
+function timeAgo(ts){const d=Date.now()-ts;if(d<60000)return'just now';if(d<3600000)return Math.floor(d/60000)+'m ago';if(d<86400000)return Math.floor(d/3600000)+'h ago';return Math.floor(d/86400000)+'d ago';}
+function toggleLike(id){const posts=getPosts();const p=posts.find(x=>x.id===id);if(!p)return;if(!p.likes)p.likes=[];const e=currentUser?.email||'anon'+Date.now();const i=p.likes.indexOf(e);if(i>=0)p.likes.splice(i,1);else p.likes.push(e);savePosts(posts);renderPosts();}
+function toggleReplies(id){const el=document.getElementById('rep'+id);if(el)el.classList.toggle('open');}
+function submitReply(id){const inp=document.getElementById('ri'+id);if(!inp||!inp.value.trim())return;const posts=getPosts();const p=posts.find(x=>x.id===id);if(!p)return;p.replies.push({author:currentUser?.name||'Guest',avatar:currentUser?.avatar||'',text:inp.value.trim(),timestamp:Date.now()});savePosts(posts);renderPosts();document.getElementById('rep'+id)?.classList.add('open');}
+
+// ══════════════════════════
+// INIT
+// ══════════════════════════
+window.addEventListener('load',()=>{
+  drawCap(1);drawCap(2);
+  if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
+  // Keyboard shortcuts in login
+  document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginCap').focus();});
+  document.getElementById('loginCap').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  // Check for existing session
+  const s=getSession();if(s)finishLogin(s);
+});
+</script>
+</body>
+</html>
